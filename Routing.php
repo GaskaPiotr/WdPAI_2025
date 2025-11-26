@@ -12,6 +12,10 @@ class Routing {
             'controller' => 'SecurityController',
             'action' => 'login'
         ],
+        'register' => [
+            'controller' => 'SecurityController',
+            'action' => 'register'
+        ],
 
         'dashboard' => [
             'controller' => 'DashboardController',
@@ -20,6 +24,11 @@ class Routing {
     ];
 
     public static function route($path) {
+        if (preg_match('/^dashboard\/(\d+)$/', $path, $matches)) {
+            $controller = DashboardController::getInstance();
+            $controller->show($matches[1]); // wywołujemy metodę show($id)
+            return;
+        }
         switch ($path) {
             case 'dashboard':
             case 'login':
@@ -27,7 +36,7 @@ class Routing {
                 $controller = Routing::$routes[$path]['controller'];
                 $action = Routing::$routes[$path]['action'];
 
-                $controllerObj = new $controller;
+                $controllerObj = $controller::getInstance();
                 $controllerObj->$action();
                 break;
             default:

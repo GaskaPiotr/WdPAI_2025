@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,7 +26,16 @@
         </aside>
         <main>
             <h1>CARDS</h1>
+
             <!-- TODO display list of cards -->
+            <ul>
+                <?php foreach($cards as $key=>$value): ?>
+                <li>
+                    <?php echo $value['title']; ?>
+                    <img src="<?= $value['imageUrlPath']; ?>">
+                </li>
+                <?php endforeach; ?>
+            </ul>
         </main>
     </div>
 </body>

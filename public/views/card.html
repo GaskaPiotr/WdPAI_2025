@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $card['title'] ?></title>
+    <link rel="stylesheet" type="text/css" href="/public/styles/main.css">
+    <script src="public/scripts/main.js" defer></script>
+</head>
+
+<body>
+    <nav>
+        <p>LOGO</p>
+        <!--<ul>
+            <li><a href="/dashboard">← Back to dashboard</a></li>
+        </ul>-->
+    </nav>
+
+    <div class="container">
+        <aside>
+            <p>PODRĘCZNE MENU</p>
+        </aside>
+
+        <main>
+            <h1><?= $card['title'] ?></h1>
+            <h3><?= $card['subtitle'] ?></h3>
+            <img src="<?= $card['imageUrlPath'] ?>" alt="<?= $card['title'] ?>">
+        </main>
+    </div>
+</body>
+
+</html>

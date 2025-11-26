@@ -33,3 +33,7 @@ form {
     width: 100vw;
    } 
 }
+
+.message {
+    color: red;
+}
