@@ -1,11 +1,16 @@
 <?php
 
 require_once 'AppController.php';
+require_once __DIR__.'/../repository/UserRepository.php';
 
 class SecurityController extends AppController {
+    private $userRepository;
+
+    public function __construct() {
+        $this->userRepository = new UserRepository();
+    }
     private static $instance = null;
 
-    private function __construct() {}
 
     public static function getInstance() {
         if (self::$instance === null) {
@@ -70,13 +75,11 @@ class SecurityController extends AppController {
         // TODO możemy przechowywać sesje użytkowika lub token
         // setcookie("username", $userRow['email'], time() + 3600, '/');
 
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/dashboard");
 
 //        var_dump($email, $password);
 
         // $this->render("login", ("name" -> "jakiesimie"));
-//        return $this->render("dashboard");
+        return $this->render("dashboard");
     }
     
     public function register() {
@@ -93,21 +96,29 @@ class SecurityController extends AppController {
 
         $firstname = $_POST["firstname"] ?? '';
         $lastname = $_POST["lastname"] ?? '';
+
+       
+        if (empty($email) || empty($password1) || empty($firstname)) {
+            return $this->render('register', ['messages' => 'Fill all fields']);
+        }
+
+        if ($password1 !== $password2) {
+            return $this->render('register', ['messages' => 'asswords should be the same!']);
+        }
         
         $hashedPassword = password_hash($password1, PASSWORD_BCRYPT);
 
-        self::$users[] = [
-            'email' => $email,
-            'password' => $hashedPassword,
-            'first_name' => $firstname
-        ];
 
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/login");
+        $this->userRepository->createUser(
+            $email,
+            $hashedPassword,
+            $firstname
+        );
 
-//        return $this->render("login", ["message" => "Zarejestrowano uzytkownika ".$email]);
+        return $this->render("login", ["message" => "Zarejestrowano uzytkownika ".$email]);
 
     }
+ 
 }
 
 ?>

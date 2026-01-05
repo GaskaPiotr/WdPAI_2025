@@ -2,12 +2,12 @@
 
 require_once 'AppController.php';
 require_once __DIR__.'/../repository/UserRepository.php';
+require_once __DIR__.'/../repository/CardsRepository.php';
 
 class DashboardController extends AppController {
 
     private static $instance = null;
 
-    private function __construct() {}
 
     public static function getInstance() {
         if (self::$instance === null) {
@@ -57,11 +57,6 @@ class DashboardController extends AppController {
 
     public function index() {
         // TODO prepare dataset and display in HTML
-    
-        $userRepository = new UserRepository();
-        $users = $userRepository->getUsers();
-
-        var_dump($users);
 
         return $this->render("dashboard", ["cards" => $this->cards]);
     }
@@ -81,5 +76,37 @@ class DashboardController extends AppController {
         }
 
         return $this->render("card", ["card" => $card]);
+    
+    }
+
+    private $cardsRepository;
+
+    public function __construct() {
+        $this->cardsRepository = new CardsRepository();
+    }
+    
+
+    public function search() {
+        $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+        if ($contentType !== "application/json") {
+            echo json_encode(['message' => 'It\'s not an endpoint']);
+            return;
+        }
+
+        if ($this->isPost()) {
+            echo json_encode(['message'=> 'Method not allowed']);
+            return;
+        }
+        $content = trim(file_get_contents("php://input"));
+        $decoded = json_decode($content, true);
+
+        header('Content-type: application/json');
+        http_response_code(200);
+
+
+        echo json_encode(
+            $this->cardsRepository->getCardsByTitle($decoded["search"])
+        );
+        return;
     }
 }

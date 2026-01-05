@@ -21,6 +21,10 @@ class Routing {
             'controller' => 'DashboardController',
             'action' => 'index'
         ],
+        'search-cards' => [
+            'controller' => 'DashboardController',
+            'action' => 'search'
+        ]
     ];
 
     public static function route($path) {
@@ -30,6 +34,7 @@ class Routing {
             return;
         }
         switch ($path) {
+            case 'search-cards':
             case 'dashboard':
             case 'login':
             case 'register':
