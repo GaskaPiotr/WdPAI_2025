@@ -1,6 +1,6 @@
 <?php
 
-include ("routing.php");
+include ("Routing.php");
 
 //echo "<h1>Hello world 💪</h1>";
 

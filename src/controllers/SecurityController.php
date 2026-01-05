@@ -38,7 +38,44 @@ class SecurityController extends AppController {
         ],
     ];
 
+    public function login() {
+        if (!$this->isPost()) {
+            return $this->render("login");
+        }
 
+        $email = $_POST["email"] ?? '';
+        $password = $_POST["password"] ?? ''; 
+
+        if (empty($email) || empty($password)) {
+            return $this->render('login', ['messages' => ['Fill all fields']]);
+        }
+
+        // 1. Pobieramy użytkownika z bazy za pomocą Twojego repozytorium
+        $user = $this->userRepository->getUserByEmail($email);
+
+        // 2. Sprawdzamy czy użytkownik istnieje
+        if (!$user) {
+            return $this->render('login', ['message' => 'User not found']);
+        }
+        
+        // 3. Weryfikujemy hasło (pamiętaj, że w bazie PostgreSQL kolumny zazwyczaj są zwracane z małej litery)
+        // $user['password'] to zahaszowane hasło z bazy
+        if (!password_verify($password, $user['password'])) {
+            return $this->render('login', ['message' => 'Wrong password']);
+        }
+
+        // Sukces!
+        // TODO: Tutaj warto by było ustawić sesję, np:
+        // $_SESSION['user_id'] = $user['id'];
+        
+        // Przekierowanie na dashboard
+        // Używamy header() zamiast render(), żeby zmienić adres URL w przeglądarce
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/dashboard");
+    }
+
+
+    /*
     public function login() {
         //TODO get data from database
         var_dump($_SERVER["REQUEST_METHOD"]);
@@ -81,9 +118,10 @@ class SecurityController extends AppController {
         // $this->render("login", ("name" -> "jakiesimie"));
         return $this->render("dashboard");
     }
+*/
     
-    public function register() {
 
+    public function register() {
         if ($this->isGet()) {
             return $this->render("register");
         }
@@ -94,28 +132,40 @@ class SecurityController extends AppController {
         $password1 = $_POST["password1"] ?? '';
         $password2 = $_POST["password2"] ?? '';
 
-        $firstname = $_POST["firstname"] ?? '';
-        $lastname = $_POST["lastname"] ?? '';
+        $name = $_POST["name"] ?? '';
+        $surname = $_POST["surname"] ?? '';
 
-       
-        if (empty($email) || empty($password1) || empty($firstname)) {
-            return $this->render('register', ['messages' => 'Fill all fields']);
+        $roleName = $_POST["role"] ?? 'trainee';
+
+        if (empty($email) || empty($password1) || empty($name) || empty($surname)) {
+            return $this->render('register', ['messages' => ['Fill all fields']]);
         }
 
         if ($password1 !== $password2) {
-            return $this->render('register', ['messages' => 'asswords should be the same!']);
+            return $this->render('register', ['message' => 'Passwords should be the same!']);
         }
         
-        $hashedPassword = password_hash($password1, PASSWORD_BCRYPT);
+        $existingUser = $this->userRepository->getUserByEmail($email);
+        
+        if ($existingUser) {
+            return $this->render('register', ['message' => ['User with this email already exists!']]);
+        }
+        
+        try {
+            // Zamieniamy napis na ID
+            $roleId = $this->userRepository->getRoleByName($roleName);
+            
+            $hashedPassword = password_hash($password1, PASSWORD_BCRYPT);
 
+            // Przekazujemy ID do funkcji tworzącej
+            $this->userRepository->createUser($name, $surname, $email, $hashedPassword, $roleId);
 
-        $this->userRepository->createUser(
-            $email,
-            $hashedPassword,
-            $firstname
-        );
-
-        return $this->render("login", ["message" => "Zarejestrowano uzytkownika ".$email]);
+            return $this->render("login", ["messages" => ["Account created! Please log in."]]);
+            
+        } catch (Exception $e) {
+            // Obsługa błędu, np. gdy rola nie istnieje w bazie
+            return $this->render('register', ['messages' => ['An error occurred during registration.']]);
+        }
 
     }
  

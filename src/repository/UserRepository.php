@@ -16,19 +16,41 @@ class UserRepository extends Repository
        return $users;
     }
 
-    public function createUser(string $email, string $hashedPassword, string $firstname): void {
-
-        // Try catch
+    // Nowa metoda: zamienia nazwę roli (np. "trainer") na jej ID (np. 2)
+    public function getRoleByName(string $roleName): int {
         $stmt = $this->database->connect()->prepare('
-            INSERT INTO users (email, password, firstName) VALUES (?, ?, ?);
+            SELECT id FROM roles WHERE name = :roleName
+        ');
+        $stmt->bindParam(':roleName', $roleName, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            // Jeśli ktoś próbuje włamać się i wysłać "admin", a nie mamy takiej roli
+            // to rzucamy błąd lub ustawiamy domyślną rolę. 
+            throw new Exception("Role not found!"); 
+        }
+
+        return $result['id'];
+    }
+
+    public function createUser(string $name, string $surname, string $email, string $password, int $roleId): void {
+        
+        $stmt = $this->database->connect()->prepare('
+            INSERT INTO users (name, surname, email, password, role_id) 
+            VALUES (?, ?, ?, ?, ?)
         ');
 
         $stmt->execute([
+            $name,
+            $surname,
             $email,
-            $hashedPassword,
-            $firstname
+            $password,
+            $roleId 
         ]);
     }
+
 
     public function getUserByEmail(string $email) {
         $stmt = $this->database->connect()->prepare('
