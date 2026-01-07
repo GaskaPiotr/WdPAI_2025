@@ -1,0 +1,24 @@
+:root {
+    --primary-color: #38e07b;
+    --bg-dark: #122017;
+    --card-dark: #1A2E21;
+    --input-bg: #15251B;
+    --text-white: #ffffff;
+    --text-gray: #a0a8a3;
+    --error-bg: #3f1515;
+    --error-text: #f87171;
+    --border-color: #2a3d30;
+    --hover-bg: #253f2e;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Lexend', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+}

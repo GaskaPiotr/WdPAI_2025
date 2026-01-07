@@ -64,10 +64,10 @@ class SecurityController extends AppController {
             return $this->render('login', ['message' => 'Wrong password']);
         }
 
-        // Sukces!
-        // TODO: Tutaj warto by było ustawić sesję, np:
-        // $_SESSION['user_id'] = $user['id'];
-        
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_email'] = $user['email']; 
+        $_SESSION['role_id'] = $user['role_id'];
+
         // Przekierowanie na dashboard
         // Używamy header() zamiast render(), żeby zmienić adres URL w przeglądarce
         $url = "http://$_SERVER[HTTP_HOST]";

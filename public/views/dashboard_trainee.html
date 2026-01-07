@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Workouts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link rel="stylesheet" href="public/styles/base.css">
+    <link rel="stylesheet" href="public/styles/dashboard.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo-section">
+            <span class="material-symbols-outlined logo-icon">fitness_center</span>
+            <span>FitTrack</span>
+        </div>
+        
+        <div class="user-section">
+            <a href="/logout" class="logout-link">Logout</a>
+            <img src="https://ui-avatars.com/api/?name=User&background=38e07b&color=000" alt="Profile" class="user-avatar">
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        
+        <div class="page-header">
+            <h1 class="page-title">My Workouts</h1>
+            
+            <div class="filters-bar">
+                <div class="search-wrapper">
+                    <span class="material-symbols-outlined" style="color: var(--text-gray);">search</span>
+                    <input type="text" placeholder="Search workouts...">
+                </div>
+                <button class="action-btn">
+                    Trainer <span class="material-symbols-outlined">arrow_drop_down</span>
+                </button>
+                <button class="action-btn">
+                    Sort by <span class="material-symbols-outlined">arrow_drop_down</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="workout-list">
+            <?php if(empty($plans)): ?>
+                <div class="empty-state">
+                    <span class="material-symbols-outlined" style="font-size: 4rem; margin-bottom: 1rem;">exercise</span>
+                    <h2>No workouts yet</h2>
+                    <p>Start your fitness journey by adding a new workout!</p>
+                </div>
+            <?php else: ?>
+                
+                <?php foreach ($plans as $plan): ?>
+                    <a href="/plan?id=<?= $plan['id']; ?>" class="workout-card">
+                        
+                        <div class="icon-box">
+                            <?php if($plan['trainer_id']): ?>
+                                <span class="material-symbols-outlined" style="font-size: 28px;">fitness_center</span>
+                            <?php else: ?>
+                                <span class="material-symbols-outlined" style="font-size: 28px;">person</span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="card-info">
+                            <div class="card-title">
+                                <?= htmlspecialchars($plan['name']); ?>
+                                
+                                <?php if($plan['status'] === 'pending'): ?>
+                                    <span class="badge badge-pending">Pending</span>
+                                <?php endif; ?>
+                            </div>
+                            <p class="card-subtitle">
+                                <?php if($plan['trainer_id']): ?>
+                                    Trainer: <?= htmlspecialchars($plan['trainer_name'] . " " . $plan['trainer_surname']); ?>
+                                <?php else: ?>
+                                    Self-made workout
+                                <?php endif; ?>
+                            </p>
+                        </div>
+
+                        <div class="card-date">
+                            <?= date('M d, Y', strtotime($plan['created_at'])); ?>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+
+            <?php endif; ?>
+        </div>
+
+    </main>
+
+    <a href="/add-plan" class="fab-btn">
+        <span class="material-symbols-outlined" style="font-size: 32px;">add</span>
+    </a>
+
+</body>
+</html>

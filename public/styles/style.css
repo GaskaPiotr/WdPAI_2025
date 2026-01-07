@@ -144,3 +144,187 @@ input:focus, select:focus {
     margin-bottom: 0.5rem;
     border: 1px solid var(--error-text);
 }
+
+
+/* --- DASHBOARD STYLES --- */
+
+/* Nawigacja */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--card-dark);
+    border-bottom: 1px solid #333;
+    margin-bottom: 2rem;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.user-profile img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+}
+
+/* Sekcja Główna */
+.dashboard-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem 6rem 1rem; /* Padding na dole dla przycisku FAB */
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+/* Pasek filtrów i wyszukiwania */
+.filter-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.search-input-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background-color: var(--card-dark);
+    border-radius: 0.5rem;
+    padding: 0 1rem;
+    min-width: 250px;
+}
+
+.search-input-wrapper input {
+    background: transparent;
+    border: none;
+    padding: 0.8rem;
+    color: white;
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--card-dark);
+    color: white;
+    border: none;
+    padding: 0 1.2rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    height: 50px; /* Wysokość dopasowana do inputa */
+}
+
+/* Lista Treningów (Karty) */
+.workout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.workout-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--card-dark);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none; /* Bo to będzie link */
+    color: inherit;
+}
+
+.workout-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.workout-icon {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(56, 224, 123, 0.1); /* Przeźroczysta zieleń */
+    color: var(--primary-color);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.workout-info {
+    flex: 1;
+}
+
+.workout-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.workout-trainer {
+    font-size: 0.875rem;
+    color: var(--text-gray);
+}
+
+.workout-date {
+    font-size: 0.875rem;
+    color: var(--text-gray);
+}
+
+/* Status Badges */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+}
+.badge-pending { background-color: #d97706; color: white; }
+.badge-accepted { background-color: var(--primary-color); color: #000; }
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--text-gray);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* Floating Action Button (FAB) - Ten plusik na dole */
+.fab-add {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 64px;
+    height: 64px;
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 15px rgba(56, 224, 123, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-decoration: none;
+}
+
+.fab-add:hover {
+    transform: scale(1.1);
+}

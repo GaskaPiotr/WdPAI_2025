@@ -2,9 +2,12 @@
 
 require_once 'AppController.php';
 require_once __DIR__.'/../repository/UserRepository.php';
-require_once __DIR__.'/../repository/CardsRepository.php';
+require_once __DIR__.'/../repository/WorkoutRepository.php';
 
 class DashboardController extends AppController {
+
+    private $workoutRepository;
+    private $userRepository;
 
     private static $instance = null;
 
@@ -16,97 +19,51 @@ class DashboardController extends AppController {
         return self::$instance;
     }
 
+    public function __construct() {
+        $this->workoutRepository = new WorkoutRepository();
+        $this->userRepository = new UserRepository();
+    }
+
    
-    private $cards = [
-            [
-                'id' => 1,
-                'title' => 'Ace of Spades',
-                'subtitle' => 'Legendary card',
-                'imageUrlPath' => 'https://deckofcardsapi.com/static/img/AS.png',
-                'href' => '/cards/ace-of-spades'
-            ],
-            [
-                'id' => 2,
-                'title' => 'Queen of Hearts',
-                'subtitle' => 'Classic romance',
-                'imageUrlPath' => 'https://deckofcardsapi.com/static/img/QH.png',
-                'href' => '/cards/queen-of-hearts'
-            ],
-            [
-                'id' => 3,
-                'title' => 'King of Clubs',
-                'subtitle' => 'Royal strength',
-                'imageUrlPath' => 'https://deckofcardsapi.com/static/img/KC.png',
-                'href' => '/cards/king-of-clubs'
-            ],
-            [
-                'id' => 4,
-                'title' => 'Jack of Diamonds',
-                'subtitle' => 'Sly and sharp',
-                'imageUrlPath' => 'https://deckofcardsapi.com/static/img/JD.png',
-                'href' => '/cards/jack-of-diamonds'
-            ],
-            [
-                'id' => 5,
-                'title' => 'Ten of Hearts',
-                'subtitle' => 'Lucky draw',
-                'imageUrlPath' => 'https://deckofcardsapi.com/static/img/0H.png',
-                'href' => '/cards/ten-of-hearts'
-            ],
-        ];
 
     public function index() {
-        // TODO prepare dataset and display in HTML
-
-        return $this->render("dashboard", ["cards" => $this->cards]);
-    }
-    public function show($id) {
-        $card = null;
-
-        foreach ($this->cards as $c) {
-            if ($c['id'] == $id) {
-                $card = $c;
-                break;
-            }
-        }
-
-        if ($card === null) {
-            include 'public/views/404.html';
+        // 1. Sprawdzamy czy użytkownik jest zalogowany
+        if (!isset($_SESSION['user_id'])) {
+            $url = "http://$_SERVER[HTTP_HOST]";
+            header("Location: {$url}/login");
             return;
         }
 
-        return $this->render("card", ["card" => $card]);
-    
-    }
-
-    private $cardsRepository;
-
-    public function __construct() {
-        $this->cardsRepository = new CardsRepository();
-    }
-    
-
-    public function search() {
-        $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
-        if ($contentType !== "application/json") {
-            echo json_encode(['message' => 'It\'s not an endpoint']);
-            return;
+        $userId = $_SESSION['user_id'];
+        $userRoleId = $_SESSION['role_id']; 
+        try {
+            // Pytamy bazę: jakie ID ma rola "trainer"?
+            $trainerRoleId = $this->userRepository->getRoleByName('trainer');
+        } catch (Exception $e) {
+            // Jeśli ktoś usunął rolę z bazy, to mamy krytyczny błąd
+            die("Critical Error: Trainer role not defined in database.");
         }
+        // Sprawdź w bazie jakie ID ma trener (np. 2). Dostosuj tę liczbę!
 
-        if ($this->isPost()) {
-            echo json_encode(['message'=> 'Method not allowed']);
-            return;
+        if ($userRoleId == $trainerRoleId) {
+            // === SCENARIUSZ TRENERA ===
+            
+            // Pobieramy dane dla trenera
+            $trainees = $this->workoutRepository->getTraineesByTrainerId($userId);
+            
+            // Ładujemy widok TRENERA
+            // AppController szuka pliku: public/views/dashboard_trainer.html
+            $this->render('dashboard_trainer', ['trainees' => $trainees]);
+
+        } else {
+            // === SCENARIUSZ ĆWICZĄCEGO ===
+            
+            // Pobieramy plany dla ćwiczącego
+            $plans = $this->workoutRepository->getPlansByUserId($userId);
+            
+            // Ładujemy widok ĆWICZĄCEGO
+            // AppController szuka pliku: public/views/dashboard_trainee.html
+            $this->render('dashboard_trainee', ['plans' => $plans]);
         }
-        $content = trim(file_get_contents("php://input"));
-        $decoded = json_decode($content, true);
-
-        header('Content-type: application/json');
-        http_response_code(200);
-
-
-        echo json_encode(
-            $this->cardsRepository->getCardsByTitle($decoded["search"])
-        );
-        return;
     }
 }
