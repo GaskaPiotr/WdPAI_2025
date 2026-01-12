@@ -168,6 +168,16 @@ class SecurityController extends AppController {
         }
 
     }
+
+    public function logout() {
+        // Czyścimy sesję
+        session_unset();
+        session_destroy();
+
+        // Przekierowanie na login
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/login");
+    }
  
 }
 

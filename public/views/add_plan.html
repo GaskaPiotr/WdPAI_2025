@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link rel="stylesheet" href="public/styles/base.css">
+    <link rel="stylesheet" href="public/styles/dashboard.css">
+    <link rel="stylesheet" href="public/styles/add.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo-section">
+            <span class="material-symbols-outlined logo-icon">fitness_center</span>
+            <span>FitTrack</span>
+        </div>
+        <div class="user-section">
+            <?php if(isset($targetTraineeId) && $targetTraineeId): ?>
+                <a href="/trainee-dashboard?id=<?= $targetTraineeId; ?>" class="logout-link">Cancel</a>
+            <?php else: ?>
+                <a href="/dashboard" class="logout-link">Back to Dashboard</a>
+            <?php endif; ?>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="page-header" style="text-align: center;">
+            <h1 class="page-title">Create Workout Plan</h1>
+            
+            <p style="color: var(--text-gray);">
+                <?php if(isset($trainee) && $trainee): ?>
+                    Creating routine for <strong style="color: var(--primary-color);"><?= htmlspecialchars($trainee['name'] . ' ' . $trainee['surname']); ?></strong>
+                <?php else: ?>
+                    Give your new routine a name.
+                <?php endif; ?>
+            </p>
+        </div>
+
+        <div class="form-card">
+            <div class="messages">
+                <?php
+                    if(isset($messages)){
+                        foreach($messages as $message) {
+                            echo '<div class="msg-error">'.$message.'</div>';
+                        }
+                    }
+                ?>
+            </div>
+
+            <form action="add-plan" method="POST">
+                
+                <?php if(isset($targetTraineeId) && $targetTraineeId): ?>
+                    <input type="hidden" name="target_trainee_id" value="<?= $targetTraineeId; ?>">
+                <?php endif; ?>
+
+                <div class="form-group">
+                    <label>Plan Name</label>
+                    <input name="plan_name" type="text" placeholder="e.g. Strength Phase 1" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Create Plan</button>
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>

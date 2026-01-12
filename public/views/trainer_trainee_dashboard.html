@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trainee Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link rel="stylesheet" href="public/styles/base.css">
+    <link rel="stylesheet" href="public/styles/dashboard.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo-section">
+            <span class="material-symbols-outlined logo-icon">fitness_center</span>
+            <span>FitTrack Trainer Panel</span>
+        </div>
+        <div class="user-section">
+            <a href="/dashboard" class="logout-link" style="margin-right: 1rem;">Back to My Dashboard</a>
+            <img src="https://ui-avatars.com/api/?name=Trainer&background=38e07b&color=000" alt="Profile" class="user-avatar">
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        
+        <div class="page-header">
+            <p style="color: var(--text-gray); margin-bottom: 0.5rem;">Viewing profile of:</p>
+            <h1 class="page-title" style="color: var(--primary-color);">
+                <?= htmlspecialchars($trainee['name'] . " " . $trainee['surname']); ?>
+            </h1>
+            <p style="color: var(--text-gray); font-size: 0.9rem;">
+                Email: <?= htmlspecialchars($trainee['email']); ?>
+            </p>
+        </div>
+
+        <div class="workout-list">
+            <?php if(empty($plans)): ?>
+                <div class="empty-state">
+                    <span class="material-symbols-outlined" style="font-size: 4rem; margin-bottom: 1rem;">assignment_add</span>
+                    <h2>No plans assigned yet.</h2>
+                    <p>Create the first workout plan for this trainee!</p>
+                </div>
+            <?php else: ?>
+                
+                <?php foreach ($plans as $plan): ?>
+                    <div class="workout-card">
+                        <div class="icon-box">
+                            <span class="material-symbols-outlined">fitness_center</span>
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">
+                                <?= htmlspecialchars($plan['name']); ?>
+                            </div>
+                            <p class="card-date">
+                                Created: <?= date('M d, Y', strtotime($plan['created_at'])); ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+
+            <?php endif; ?>
+        </div>
+
+    </main>
+
+    <a href="/add-plan?traineeId=<?= $trainee['id']; ?>" class="fab-btn">
+        <span class="material-symbols-outlined" style="font-size: 32px;">add</span>
+    </a>
+
+</body>
+</html>

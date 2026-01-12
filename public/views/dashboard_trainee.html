@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Workouts</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="public/styles/base.css">
     <link rel="stylesheet" href="public/styles/dashboard.css">
+    <script src="public/scripts/trainee.js" defer></script>
 </head>
+
 <body>
 
     <header class="navbar">
@@ -16,18 +19,67 @@
             <span class="material-symbols-outlined logo-icon">fitness_center</span>
             <span>FitTrack</span>
         </div>
-        
+        <!--
         <div class="user-section">
             <a href="/logout" class="logout-link">Logout</a>
             <img src="https://ui-avatars.com/api/?name=User&background=38e07b&color=000" alt="Profile" class="user-avatar">
+        </div>//-->
+        <div class="user-section">
+            <div class="notifications-wrapper" style="position: relative; cursor: pointer; margin-right: 1rem;"
+                onclick="toggleNotifications()">
+                <span class="material-symbols-outlined" style="color: var(--text-white);">notifications</span>
+
+                <?php if(!empty($invitations)): ?>
+                <span
+                    style="position: absolute; top: 0; right: 0; width: 10px; height: 10px; background-color: #f87171; border-radius: 50%;"></span>
+                <?php endif; ?>
+
+                <div id="notificationDropdown"
+                    style="display: none; position: absolute; top: 120%; right: 0; width: 300px; background-color: var(--card-dark); border: 1px solid var(--border-color); border-radius: 0.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 200; overflow: hidden;">
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); font-weight: bold;">
+                        Notifications</div>
+
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <?php if(empty($invitations)): ?>
+                        <div style="padding: 1rem; text-align: center; color: var(--text-gray); font-size: 0.9rem;">No
+                            new notifications</div>
+                        <?php else: ?>
+
+                        <?php foreach($invitations as $invite): ?>
+                        <div style="padding: 1rem; border-bottom: 1px solid #333;">
+                            <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                <strong style="color: var(--primary-color);">
+                                    <?= htmlspecialchars($invite['name'] . ' ' . $invite['surname']); ?>
+                                </strong>
+                                wants to be your trainer.
+                            </p>
+
+                            <form action="handle-invitation" method="POST" style="display: flex; gap: 0.5rem;">
+                                <input type="hidden" name="request_id" value="<?= $invite['request_id']; ?>">
+
+                                <button name="action" value="accept"
+                                    style="flex: 1; padding: 0.4rem; background: var(--primary-color); border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Accept</button>
+                                <button name="action" value="decline"
+                                    style="flex: 1; padding: 0.4rem; background: #3f1515; color: #f87171; border: 1px solid #f87171; border-radius: 4px; cursor: pointer;">Decline</button>
+                            </form>
+                        </div>
+                        <?php endforeach; ?>
+
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <a href="/logout" class="logout-link">Logout</a>
+            <img src="https://ui-avatars.com/api/?name=User&background=38e07b&color=000" alt="Profile"
+                class="user-avatar">
         </div>
     </header>
 
     <main class="dashboard-container">
-        
+
         <div class="page-header">
             <h1 class="page-title">My Workouts</h1>
-            
+
             <div class="filters-bar">
                 <div class="search-wrapper">
                     <span class="material-symbols-outlined" style="color: var(--text-gray);">search</span>
@@ -44,46 +96,43 @@
 
         <div class="workout-list">
             <?php if(empty($plans)): ?>
-                <div class="empty-state">
-                    <span class="material-symbols-outlined" style="font-size: 4rem; margin-bottom: 1rem;">exercise</span>
-                    <h2>No workouts yet</h2>
-                    <p>Start your fitness journey by adding a new workout!</p>
-                </div>
+            <div class="empty-state">
+                <span class="material-symbols-outlined" style="font-size: 4rem; margin-bottom: 1rem;">exercise</span>
+                <h2>No workouts yet</h2>
+                <p>Start your fitness journey by adding a new workout!</p>
+            </div>
             <?php else: ?>
-                
-                <?php foreach ($plans as $plan): ?>
-                    <a href="/plan?id=<?= $plan['id']; ?>" class="workout-card">
-                        
-                        <div class="icon-box">
-                            <?php if($plan['trainer_id']): ?>
-                                <span class="material-symbols-outlined" style="font-size: 28px;">fitness_center</span>
-                            <?php else: ?>
-                                <span class="material-symbols-outlined" style="font-size: 28px;">person</span>
-                            <?php endif; ?>
-                        </div>
 
-                        <div class="card-info">
-                            <div class="card-title">
-                                <?= htmlspecialchars($plan['name']); ?>
-                                
-                                <?php if($plan['status'] === 'pending'): ?>
-                                    <span class="badge badge-pending">Pending</span>
-                                <?php endif; ?>
-                            </div>
-                            <p class="card-subtitle">
-                                <?php if($plan['trainer_id']): ?>
-                                    Trainer: <?= htmlspecialchars($plan['trainer_name'] . " " . $plan['trainer_surname']); ?>
-                                <?php else: ?>
-                                    Self-made workout
-                                <?php endif; ?>
-                            </p>
-                        </div>
+            <?php foreach ($plans as $plan): ?>
+            <a href="/plan?id=<?= $plan['id']; ?>" class="workout-card">
 
-                        <div class="card-date">
-                            <?= date('M d, Y', strtotime($plan['created_at'])); ?>
-                        </div>
-                    </a>
-                <?php endforeach; ?>
+                <div class="icon-box">
+                    <?php if($plan['trainer_id']): ?>
+                    <span class="material-symbols-outlined" style="font-size: 28px;">fitness_center</span>
+                    <?php else: ?>
+                    <span class="material-symbols-outlined" style="font-size: 28px;">person</span>
+                    <?php endif; ?>
+                </div>
+
+                <div class="card-info">
+                    <div class="card-title">
+                        <?= htmlspecialchars($plan['name']); ?>
+                    </div>
+                    <p class="card-subtitle">
+                        <?php if($plan['trainer_id']): ?>
+                        Trainer:
+                        <?= htmlspecialchars($plan['trainer_name'] . " " . $plan['trainer_surname']); ?>
+                        <?php else: ?>
+                        Self-made workout
+                        <?php endif; ?>
+                    </p>
+                </div>
+
+                <div class="card-date">
+                    <?= date('M d, Y', strtotime($plan['created_at'])); ?>
+                </div>
+            </a>
+            <?php endforeach; ?>
 
             <?php endif; ?>
         </div>
@@ -93,6 +142,6 @@
     <a href="/add-plan" class="fab-btn">
         <span class="material-symbols-outlined" style="font-size: 32px;">add</span>
     </a>
-
 </body>
+
 </html>

@@ -63,4 +63,17 @@ class UserRepository extends Repository
 
        return $users;
     }
+    
+    public function getUserById(int $id) {
+        $stmt = $this->database->connect()->prepare('
+            SELECT * FROM users WHERE id = :id
+        ');
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // fetch zwraca tablicę LUB false. Jeśli zwróci false, kontroler to wyłapie.
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $user;
+    }
 }

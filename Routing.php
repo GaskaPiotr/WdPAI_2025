@@ -4,6 +4,8 @@
 //TODO AUTOWIRING NIE TRZEBA INCLUDOWAC 
 require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/DashboardController.php';
+require_once 'src/controllers/TrainerController.php';
+require_once 'src/controllers/PlanController.php';
 
 class Routing {
 
@@ -24,7 +26,27 @@ class Routing {
         'search-cards' => [
             'controller' => 'DashboardController',
             'action' => 'search'
-        ]
+        ],
+        'add-trainee' => [
+            'controller' => 'TrainerController',
+            'action' => 'addTrainee'
+        ],
+        'handle-invitation' => [
+            'controller' => 'DashboardController',
+            'action' => 'handleInvitation'
+        ],
+        'logout' => [
+            'controller' => 'SecurityController',
+            'action' => 'logout'
+        ],
+        'add-plan' => [
+            'controller' => 'PlanController',
+            'action' => 'addPlan'
+        ],
+        'trainee-dashboard' => [
+            'controller' => 'TrainerController',
+            'action' => 'showTraineeDashboard'
+        ],
     ];
 
     public static function route($path) {
@@ -36,6 +58,11 @@ class Routing {
         switch ($path) {
             case 'search-cards':
             case 'dashboard':
+            case 'add-trainee':
+            case 'handle-invitation':
+            case 'logout':
+            case 'add-plan':
+            case 'trainee-dashboard':
             case 'login':
             case 'register':
                 $controller = Routing::$routes[$path]['controller'];

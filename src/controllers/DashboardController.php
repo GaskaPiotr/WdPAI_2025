@@ -60,10 +60,36 @@ class DashboardController extends AppController {
             
             // Pobieramy plany dla ćwiczącego
             $plans = $this->workoutRepository->getPlansByUserId($userId);
+           
             
+            $invitations = $this->workoutRepository->getPendingInvitations($userId);
+
             // Ładujemy widok ĆWICZĄCEGO
             // AppController szuka pliku: public/views/dashboard_trainee.html
-            $this->render('dashboard_trainee', ['plans' => $plans]);
+            $this->render('dashboard_trainee', [
+                'plans' => $plans,
+                'invitations' => $invitations
+            ]);
         }
+    }
+    
+
+    public function handleInvitation() {
+        if (!$this->isPost()) {
+            return;
+        }
+
+        $requestId = $_POST['request_id'];
+        $action = $_POST['action']; // 'accept' lub 'decline'
+
+        if ($action === 'accept') {
+            $this->workoutRepository->acceptInvitation((int)$requestId);
+        } elseif ($action === 'decline') {
+            $this->workoutRepository->declineInvitation((int)$requestId);
+        }
+
+        // Odśwież stronę
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/dashboard");
     }
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Trainee</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link rel="stylesheet" href="public/styles/base.css">
+    <link rel="stylesheet" href="public/styles/dashboard.css">
+    <link rel="stylesheet" href="public/styles/add_trainee.css"> 
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo-section">
+            <span class="material-symbols-outlined logo-icon">fitness_center</span>
+            <span>FitTrack</span>
+        </div>
+        <div class="user-section">
+            <a href="/dashboard" class="logout-link">Back to Dashboard</a>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="page-header" style="text-align: center;">
+            <h1 class="page-title">Add New Trainee</h1>
+            <p style="color: var(--text-gray);">Enter the email address of the user you want to coach.</p>
+        </div>
+
+        <div class="form-card">
+            <div class="messages">
+                <?php
+                    if(isset($messages)){
+                        foreach($messages as $message) {
+                            echo '<div class="msg-error">'.$message.'</div>';
+                        }
+                    }
+                ?>
+            </div>
+
+            <form action="add-trainee" method="POST">
+                <div class="form-group">
+                    <label>Trainee Email</label>
+                    <input name="email" type="email" placeholder="user@example.com">
+                </div>
+
+                <button type="submit" class="btn-primary">Add Trainee</button>
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>
