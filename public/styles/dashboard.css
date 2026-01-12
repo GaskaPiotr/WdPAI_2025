@@ -250,3 +250,72 @@
 .btn-add:hover {
     transform: scale(1.02);
 }
+
+/* --- DELETE BUTTON STYLES --- */
+.workout-card {
+    position: relative; /* Ważne, żeby przycisk pozycjonował się względem karty */
+}
+
+.delete-btn-form {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+}
+
+.btn-delete {
+    background: transparent;
+    border: none;
+    color: var(--text-gray);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: rgba(231, 76, 60, 0.2); /* Czerwona poświata */
+    color: #e74c3c; /* Czerwony kolor */
+}
+
+
+/* --- NOWY UKŁAD KARTY Z KOSZEM OBOK --- */
+
+.workout-wrapper {
+    display: flex;
+    align-items: center; /* Wyrównanie w pionie */
+    gap: 1rem; /* Odstęp między kartą a koszem */
+    margin-bottom: 1rem; /* Odstęp między kolejnymi wierszami */
+}
+
+/* Nadpisujemy kartę, żeby była elastyczna */
+.workout-card {
+    flex: 1; /* Zajmuje całą dostępną przestrzeń */
+    margin-bottom: 0 !important; /* Usuwamy margines, bo wrapper go ma */
+}
+
+/* Stylizacja przycisku "stojącego obok" */
+.btn-delete-side {
+    width: 50px;
+    height: 50px; /* Kwadrat */
+    background-color: rgba(63, 21, 21, 0.4); /* Ciemne tło wpadające w czerwień */
+    border: 1px solid #5c2b2b;
+    border-radius: 1rem; /* Takie samo zaokrąglenie jak karta */
+    color: #ef4444; /* Czerwony kolor ikony */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0; /* Żeby się nie zgniótł */
+}
+
+.btn-delete-side:hover {
+    background-color: #7f1d1d; /* Jaśniejszy czerwony przy najechaniu */
+    color: white;
+    border-color: #ef4444;
+    transform: scale(1.05);
+}

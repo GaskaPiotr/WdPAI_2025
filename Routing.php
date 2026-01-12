@@ -47,6 +47,22 @@ class Routing {
             'controller' => 'TrainerController',
             'action' => 'showTraineeDashboard'
         ],
+        'delete-plan' => [
+            'controller' => 'PlanController',
+            'action' => 'delete'
+        ],
+        'plan' => [
+            'controller' => 'PlanController',
+            'action' => 'index' // To wyświetla szczegóły
+        ],
+        'add-exercise' => [
+            'controller' => 'PlanController',
+            'action' => 'addExercise'
+        ],
+        'delete-exercise' => [
+            'controller' => 'PlanController',
+            'action' => 'deleteExercise'
+        ],
     ];
 
     public static function route($path) {
@@ -56,6 +72,10 @@ class Routing {
             return;
         }
         switch ($path) {
+            case 'plan':
+            case 'add-exercise':
+            case 'delete-exercise':
+            case 'delete-plan':
             case 'search-cards':
             case 'dashboard':
             case 'add-trainee':

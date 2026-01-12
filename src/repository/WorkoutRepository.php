@@ -125,4 +125,25 @@ class WorkoutRepository extends Repository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } 
+
+
+    public function getPlanById(int $planId)
+    {
+        $stmt = $this->database->connect()->prepare('
+            SELECT * FROM workout_plans WHERE id = :id
+        ');
+        $stmt->bindParam(':id', $planId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function deletePlan(int $planId): void
+    {
+        $stmt = $this->database->connect()->prepare('
+            DELETE FROM workout_plans WHERE id = :id
+        ');
+        $stmt->bindParam(':id', $planId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
 }

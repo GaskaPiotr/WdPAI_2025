@@ -1,0 +1,148 @@
+/* Stylizacja listy ćwiczeń */
+.exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.exercise-card {
+    background-color: var(--card-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid var(--primary-color);
+    /* Akcent z lewej */
+}
+
+.exercise-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.exercise-meta {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Formularz dodawania (inline) */
+.add-exercise-form {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr auto;
+    /* Układ kolumnowy */
+    gap: 1rem;
+    align-items: end;
+    /* Wyrównanie przycisków do dołu */
+}
+
+/* Na mobile zróbmy formularz pionowy */
+@media (max-width: 768px) {
+    .add-exercise-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.add-exercise-form {
+    background-color: var(--card-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    /* Zmieniamy grid na flex z wrapem, bezpieczniej */
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    border: 1px solid var(--border-color);
+}
+
+.add-exercise-form .form-group {
+    flex: 1;
+    min-width: 150px;
+    /* Żeby pola nie były za wąskie */
+}
+
+/* Przycisk Add niech ma stałą szerokość */
+.add-exercise-form .btn-primary {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 0.8rem 2rem;
+}
+
+.add-exercise-form {
+    background-color: var(--card-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    /* Wyrównanie do dołu */
+    border: 1px solid var(--border-color);
+}
+
+.form-group {
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    /* Etykieta nad inputem */
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    /* Żeby etykieta się nie łamała */
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.8rem;
+    height: 45px;
+    /* Sztywna wysokość dla inputów */
+    background: var(--input-bg);
+    border: 1px solid transparent;
+    color: white;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    /* Ważne dla paddingu */
+    width: 100%;
+}
+
+/* POPRAWIONY STYL BADGE'A */
+.detected-type-badge {
+    height: 45px;
+    /* Ta sama wysokość co input! */
+    padding: 0 1rem;
+    background: rgba(56, 224, 123, 0.1);
+    border: 1px solid var(--primary-color);
+    border-radius: 0.5rem;
+    color: var(--primary-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    /* Wyśrodkowanie tekstu w pionie */
+    gap: 0.5rem;
+    white-space: nowrap;
+    /* Zapobiega łamaniu tekstu */
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Na wypadek długiego tekstu */
+    width: 100%;
+    /* Rozciągnij na całą szerokość kontenera */
+}
