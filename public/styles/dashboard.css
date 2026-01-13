@@ -319,3 +319,26 @@
     border-color: #ef4444;
     transform: scale(1.05);
 }
+
+
+.btn-start-side {
+    width: 50px;
+    height: 50px; /* Taki sam rozmiar jak kosz */
+    background-color: rgba(56, 224, 123, 0.1); /* Lekka zieleń */
+    border: 1px solid var(--primary-color);
+    border-radius: 1rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* Usuwa podkreślenie linku */
+    transition: all 0.2s;
+    flex-shrink: 0; /* Nie zgniataj mnie! */
+}
+
+.btn-start-side:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-dark); /* Czarny tekst na zielonym tle */
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(56, 224, 123, 0.3); /* Zielona poświata */
+}

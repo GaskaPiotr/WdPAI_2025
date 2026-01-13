@@ -1,0 +1,187 @@
+ body {
+     background-color: var(--bg-dark, #122017);
+     color: white;
+     font-family: 'Lexend', sans-serif;
+     display: flex;
+     flex-direction: column;
+     height: 100vh;
+     overflow: hidden;
+ }
+
+ /* HEADER */
+ .session-header {
+     background-color: rgba(18, 32, 23, 0.95);
+     padding: 1rem;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+ }
+
+ .header-title h1 {
+     margin: 0;
+     font-size: 1.1rem;
+ }
+
+ .subtitle {
+     color: var(--primary-color, #38e07b);
+     font-size: 0.75rem;
+     text-transform: uppercase;
+     font-weight: 700;
+     display: block;
+ }
+
+ /* TABELA */
+ .table-wrapper {
+     flex: 1;
+     overflow: auto;
+     /* Scroll w obu osiach */
+     padding-bottom: 80px;
+ }
+
+ table {
+     width: 100%;
+     border-collapse: separate;
+     /* Wymagane dla sticky */
+     border-spacing: 0;
+     min-width: 800px;
+     /* Szeroka tabela, żeby był scroll */
+ }
+
+ th {
+     background-color: rgba(255, 255, 255, 0.05);
+     color: rgba(255, 255, 255, 0.5);
+     font-size: 0.75rem;
+     text-transform: uppercase;
+     padding: 1rem;
+     text-align: center;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+     position: sticky;
+     top: 0;
+     z-index: 20;
+     /* Nagłówek nad treścią */
+ }
+
+ /* Pierwsza kolumna (Nazwa ćwiczenia) - Sticky Left */
+ .col-exercise {
+     position: sticky;
+     left: 0;
+     background-color: #122017;
+     z-index: 30;
+     /* Najwyżej, nad innymi sticky */
+     border-right: 1px solid rgba(255, 255, 255, 0.1);
+     min-width: 160px;
+     max-width: 160px;
+     padding: 1rem;
+     vertical-align: top;
+ }
+
+ /* Sticky Header dla pierwszej kolumny */
+ th.col-exercise {
+     z-index: 40;
+     /* Absolutnie najwyżej */
+     background-color: #122017;
+ }
+
+ td {
+     padding: 0.75rem;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+     vertical-align: top;
+     min-width: 140px;
+     /* Minimalna szerokość kolumny z historią */
+ }
+
+ /* Kolumna "TODAY" */
+ .col-today {
+     background-color: rgba(56, 224, 123, 0.02);
+     /* Lekkie podświetlenie */
+     border-left: 1px solid rgba(255, 255, 255, 0.1);
+     min-width: 160px;
+ }
+
+ th.col-today {
+     color: var(--primary-color, #38e07b);
+     background-color: rgba(18, 32, 23, 0.95);
+ }
+
+ /* Inputy w komórkach */
+ .set-row {
+     margin-bottom: 6px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     height: 36px;
+     /* Stała wysokość wiersza serii */
+ }
+
+ /* Inputy do wpisywania (Today) */
+ .active-input-group {
+     display: flex;
+     gap: 4px;
+     width: 100%;
+ }
+
+ .workout-input {
+     width: 100%;
+     background: rgba(255, 255, 255, 0.1);
+     border: 1px solid transparent;
+     color: white;
+     text-align: center;
+     border-radius: 4px;
+     font-size: 0.9rem;
+     height: 36px;
+ }
+
+ .workout-input:focus {
+     border-color: #38e07b;
+     outline: none;
+     background: rgba(255, 255, 255, 0.15);
+ }
+
+ /* Historia (Read Only) */
+ .history-value {
+     color: rgba(255, 255, 255, 0.6);
+     font-size: 0.85rem;
+     background: rgba(255, 255, 255, 0.03);
+     border-radius: 4px;
+     width: 100%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     height: 36px;
+ }
+
+ /* Checkbox */
+ .check-box {
+     width: 36px;
+     height: 36px;
+     margin-left: 4px;
+     cursor: pointer;
+     accent-color: #38e07b;
+     flex-shrink: 0;
+ }
+
+ /* Footer */
+ .footer {
+     position: fixed;
+     bottom: 0;
+     left: 0;
+     width: 100%;
+     background: rgba(18, 32, 23, 0.95);
+     padding: 1rem;
+     border-top: 1px solid rgba(255, 255, 255, 0.1);
+     display: flex;
+     gap: 1rem;
+     z-index: 50;
+ }
+
+ .btn-primary {
+     background: #38e07b;
+     color: #122017;
+     border: none;
+     padding: 12px;
+     border-radius: 8px;
+     font-weight: 700;
+     width: 100%;
+     cursor: pointer;
+ }

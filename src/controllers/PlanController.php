@@ -190,4 +190,95 @@ class PlanController extends AppController {
             header("Location: {$url}/dashboard");
         }
     }
+
+
+ 
+   public function startWorkout()
+    {
+        $planId = $_GET['id'] ?? null;
+        if (!$planId) { header("Location: /dashboard"); return; }
+
+        $plan = $this->workoutRepository->getPlanById((int)$planId);
+        $exercises = $this->exerciseRepository->getExercisesByPlanId((int)$planId);
+
+        // 1. Pobieramy sesje (już są odwrócone w repozytorium: Stare -> Nowe)
+        $pastSessions = $this->workoutRepository->getLastSessions((int)$planId, 3);
+        
+        $sessionIds = [];
+        $historyNotes = [];
+
+        // Zbieramy ID sesji do zapytania SQL i notatki
+        foreach ($pastSessions as $s) {
+            $sessionIds[] = $s['id'];
+            // Kluczem notatki jest teraz ID SESJI, a nie data
+            $historyNotes[$s['id']] = $s['user_note'] ?? '';
+        }
+
+        // 2. Pobieramy logi
+        $logs = $this->workoutRepository->getLogsForSessions($sessionIds);
+
+        // 3. Budujemy dane: $historyData[plan_exercise_id][SESSION_ID][set_index]
+        $historyData = [];
+
+        foreach ($logs as $log) {
+            $relationId = $log['plan_exercise_id'];
+            $sessionId = $log['workout_session_id']; // <--- To jest nasz unikalny klucz
+            
+            // Formatowanie (bez zmian)
+            $formattedResult = '-';
+            if ($log['weight'] !== null && $log['reps'] !== null) {
+                $formattedResult = floatval($log['weight']) . 'kg x ' . $log['reps'];
+            } elseif ($log['time_seconds'] !== null && $log['distance_km'] !== null) {
+                $timeStr = gmdate("i:s", $log['time_seconds']);
+                $formattedResult = floatval($log['distance_km']) . 'km ' . $timeStr;
+            } elseif ($log['time_seconds'] !== null) {
+                $formattedResult = gmdate("i:s", $log['time_seconds']);
+            } elseif ($log['reps'] !== null) {
+                $formattedResult = $log['reps'] . ' reps';
+            } elseif ($log['distance_km'] !== null) {
+                $formattedResult = floatval($log['distance_km']) . ' km';
+            }
+
+            $arrayIndex = $log['set_number'] - 1;
+            
+            // ZAPISUJEMY POD ID SESJI, NIE POD DATĄ
+            $historyData[$relationId][$sessionId][$arrayIndex] = $formattedResult;
+        }
+
+        return $this->render('workout_session', [
+            'plan' => $plan,
+            'exercises' => $exercises,
+            'pastSessions' => $pastSessions, // Przekazujemy całe obiekty sesji (mają datę i ID)
+            'historyData' => $historyData,
+            'historyNotes' => $historyNotes
+        ]);
+    }
+
+    public function saveWorkout()
+    {
+        if (!$this->isPost()) {
+            header("Location: /dashboard");
+            return;
+        }
+
+        $planId = $_POST['plan_id'];
+        $userNote = $_POST['user_note'] ?? ''; // Odbieramy nową notatkę
+        $results = $_POST['results'] ?? [];
+
+        if (empty($results)) {
+            header("Location: /dashboard"); 
+            return;
+        }
+
+        try {
+            // Wywołujemy repozytorium (już bez user_id, zgodnie z Twoją tabelą)
+            $this->workoutRepository->saveSession((int)$planId, $userNote, $results);
+            
+            $url = "http://$_SERVER[HTTP_HOST]";
+            header("Location: {$url}/dashboard");
+
+        } catch (Exception $e) {
+            die("Error saving workout: " . $e->getMessage());
+        }
+    }
 }

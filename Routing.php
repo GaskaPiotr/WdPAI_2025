@@ -63,6 +63,14 @@ class Routing {
             'controller' => 'PlanController',
             'action' => 'deleteExercise'
         ],
+        'start-workout' => [
+            'controller' => 'PlanController',
+            'action' => 'startWorkout'
+        ],
+        'save-workout' => [
+            'controller' => 'PlanController',
+            'action' => 'saveWorkout'
+        ],
     ];
 
     public static function route($path) {
@@ -72,6 +80,8 @@ class Routing {
             return;
         }
         switch ($path) {
+            case 'save-workout':
+            case 'start-workout':
             case 'plan':
             case 'add-exercise':
             case 'delete-exercise':

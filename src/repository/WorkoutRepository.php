@@ -146,4 +146,132 @@ class WorkoutRepository extends Repository
         $stmt->bindParam(':id', $planId, PDO::PARAM_INT);
         $stmt->execute();
     }
+
+
+    public function saveSession(int $planId, string $userNote, array $results): void
+    {
+        $pdo = $this->database->connect();
+        
+        try {
+            $pdo->beginTransaction();
+
+            // 1. Zapisujemy SESJĘ
+            $stmt = $pdo->prepare('
+                INSERT INTO workout_sessions (workout_plan_id, user_note) 
+                VALUES (:plan_id, :note) 
+                RETURNING id
+            ');
+            $stmt->bindParam(':plan_id', $planId, PDO::PARAM_INT);
+            $stmt->bindParam(':note', $userNote, PDO::PARAM_STR);
+            $stmt->execute();
+            
+            $sessionId = $stmt->fetch(PDO::FETCH_ASSOC)['id'];
+
+            // 2. Zapisujemy LOGI
+            $sql = 'INSERT INTO workout_logs 
+                    (workout_session_id, plan_exercise_id, set_number, weight, reps, time_seconds, distance_km) 
+                    VALUES (:session_id, :pe_id, :set_num, :w, :r, :t, :d)';
+            $stmtLog = $pdo->prepare($sql);
+
+            foreach ($results as $planExerciseId => $sets) {
+                foreach ($sets as $setNumber => $data) {
+                    
+                    // Walidacja: czy cokolwiek wpisano?
+                    if ($this->isEmptySet($data)) {
+                        continue; 
+                    }
+
+                    // --- POPRAWKA TUTAJ: Używamy '??' aby uniknąć błędu Undefined array key ---
+                    
+                    // Pobieramy wartość lub pusty string, jeśli klucz nie istnieje
+                    $rawWeight = $data['weight'] ?? '';
+                    $rawReps   = $data['reps'] ?? '';
+                    $rawDist   = $data['dist'] ?? '';
+                    $rawTime   = $data['time'] ?? '';
+
+                    // Konwersja na typy odpowiednie dla bazy (lub NULL)
+                    $weight = $rawWeight !== '' ? (float)$rawWeight : null;
+                    $reps   = $rawReps !== '' ? (int)$rawReps : null;
+                    $dist   = $rawDist !== '' ? (float)$rawDist : null;
+                    
+                    // Konwersja czasu
+                    $timeSeconds = null;
+                    if ($rawTime !== '') {
+                        $timeSeconds = $this->timeToSeconds($rawTime);
+                    }
+
+                    $stmtLog->bindValue(':session_id', $sessionId, PDO::PARAM_INT);
+                    $stmtLog->bindValue(':pe_id', $planExerciseId, PDO::PARAM_INT);
+                    $stmtLog->bindValue(':set_num', $setNumber, PDO::PARAM_INT);
+                    $stmtLog->bindValue(':w', $weight);
+                    $stmtLog->bindValue(':r', $reps);
+                    $stmtLog->bindValue(':t', $timeSeconds);
+                    $stmtLog->bindValue(':d', $dist);
+                    
+                    $stmtLog->execute();
+                }
+            }
+
+            $pdo->commit();
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+    }
+
+    // Pomocnicza: Zamiana mm:ss na sekundy
+    private function timeToSeconds($timeStr) {
+        if (strpos($timeStr, ':') !== false) {
+            list($min, $sec) = explode(':', $timeStr);
+            return ($min * 60) + $sec;
+        }
+        return (int)$timeStr;
+    }
+
+    // Pomocnicza: Sprawdzenie czy inputy są puste
+    private function isEmptySet($data) {
+        // Funkcja empty() jest bezpieczna - nie rzuca błędu jeśli klucz nie istnieje
+        return empty($data['weight']) && empty($data['reps']) 
+            && empty($data['time']) && empty($data['dist']);
+    }
+
+    // Pobierz X ostatnich sesji dla danego planu
+    public function getLastSessions(int $planId, int $limit = 3): array
+    {
+        // Dodałem: user_note
+        $stmt = $this->database->connect()->prepare('
+            SELECT id, date, user_note 
+            FROM workout_sessions 
+            WHERE workout_plan_id = :plan_id 
+            ORDER BY date DESC 
+            LIMIT :limit
+        ');
+        $stmt->bindParam(':plan_id', $planId, PDO::PARAM_INT);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $sessions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return array_reverse($sessions);
+    }
+
+    // Pobierz logi (wyniki) dla listy ID sesji
+    public function getLogsForSessions(array $sessionIds): array
+    {
+        if (empty($sessionIds)) {
+            return [];
+        }
+
+        // Tworzymy string z placeholderami (?,?,?) zależnie od ilości sesji
+        $placeholders = implode(',', array_fill(0, count($sessionIds), '?'));
+
+        $stmt = $this->database->connect()->prepare("
+            SELECT * FROM workout_logs 
+            WHERE workout_session_id IN ($placeholders)
+            ORDER BY set_number ASC
+        ");
+
+        $stmt->execute($sessionIds);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
