@@ -11,168 +11,7 @@
     <link rel="stylesheet" href="/public/styles/base.css">
     <link rel="stylesheet" href="/public/styles/workout_session.css">
 </head>
-<!--
-<body>
 
-    <header class="session-header">
-        <div>
-            <span class="subtitle">Session Active</span>
-            <h1>
-                <?= htmlspecialchars($plan['name']); ?>
-            </h1>
-        </div>
-        <a href="/dashboard" style="color: white; opacity: 0.5;"><span
-                class="material-symbols-outlined">close</span></a>
-    </header>
-
-    <form id="workout-form" method="POST" action="save-workout" class="table-wrapper">
-        <input type="hidden" name="plan_id" value="<?= $plan['id']; ?>">
-
-        <table>
-            <tbody>
-                <?php foreach ($exercises as $exercise): ?>
-                <tr>
-                    <td class="col-today">
-                        <?php for($i = 1; $i <= $exercise['sets_count']; $i++): ?>
-                        <div class="set-row">
-                            <div class="active-input-group">
-
-                                <?php 
-                                            // WAŻNE: Używamy relation_id, bo to jest 'plan_exercise_id' w bazie logów!
-                                            // Wynik: results[155][1][weight]
-                                            $baseName = "results[{$exercise['relation_id']}][{$i}]"; 
-                                        ?>
-
-                                <?php if ($exercise['type'] === 'weight_reps'): ?>
-                                <input type="number" step="0.5" name="<?= $baseName ?>[weight]" class="workout-input"
-                                    placeholder="kg">
-                                <input type="number" name="<?= $baseName ?>[reps]" class="workout-input"
-                                    placeholder="reps">
-
-                                <?php elseif ($exercise['type'] === 'time_only'): ?>
-                                <input type="text" name="<?= $baseName ?>[time]" class="workout-input"
-                                    placeholder="mm:ss">
-
-                                <?php elseif ($exercise['type'] === 'reps_only'): ?>
-                                <input type="number" name="<?= $baseName ?>[reps]" class="workout-input"
-                                    placeholder="reps">
-
-                                <?php elseif ($exercise['type'] === 'distance_time' || $exercise['type'] === 'time_distance'): ?>
-                                <input type="number" step="0.1" name="<?= $baseName ?>[dist]" class="workout-input"
-                                    placeholder="km">
-                                <input type="text" name="<?= $baseName ?>[time]" class="workout-input"
-                                    placeholder="mm:ss">
-                                <?php endif; ?>
-
-                            </div>
-                            <input type="checkbox" class="check-box">
-                        </div>
-                        <?php endfor; ?>
-                    </td>
-
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <div style="padding: 1rem; background: rgba(18,32,23,0.95); border-top: 1px solid rgba(255,255,255,0.1);">
-            <label
-                style="display: block; color: var(--primary-color); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase;">
-                Session Note
-            </label>
-            <textarea name="user_note" placeholder="How was the workout? (e.g. Felt strong, Knee pain...)"
-                style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 0.9rem; min-height: 80px; resize: vertical;"></textarea>
-        </div>
-
-    </form>
-    <!--
-    <form id="workout-form" method="POST" action="save-workout" class="table-wrapper">
-        <input type="hidden" name="plan_id" value="<?= $plan['id']; ?>">
-
-        <table>
-            <thead>
-                <tr>
-                    <th class="col-exercise">Exercise</th>
-                    
-                    <?php foreach($historyDates as $date): ?>
-                        <th><?= date('M d', strtotime($date)); ?></th>
-                    <?php endforeach; ?>
-
-                    <th class="col-today">TODAY</th>
-                </tr>
-            </thead>
-            <tbody>
-                
-                <?php foreach ($exercises as $exercise): ?>
-                    <tr>
-                        
-                        <td class="col-exercise">
-                            <div style="color: #38e07b; font-weight: 700; margin-bottom: 4px;">
-                                <?= htmlspecialchars($exercise['name']); ?>
-                            </div>
-                            <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">
-                                <?= $exercise['type']; ?>
-                            </div>
-                            <?php if($exercise['note']): ?>
-                                <div style="font-size: 0.75rem; color: #aaa; margin-top: 4px;">
-                                    <?= htmlspecialchars($exercise['note']); ?>
-                                </div>
-                            <?php endif; ?>
-                        </td>
-
-                        <?php foreach($historyDates as $date): ?>
-                            <td>
-                                <?php for($i = 0; $i < $exercise['sets_count']; $i++): ?>
-                                    <div class="set-row">
-                                        <div class="history-value">
-                                            <?= $historyData[$exercise['relation_id']][$date][$i] ?? '-'; ?>
-                                        </div>
-                                    </div>
-                                <?php endfor; ?>
-                            </td>
-                        <?php endforeach; ?>
-
-                        <td class="col-today">
-                            <?php for($i = 0; $i < $exercise['sets_count']; $i++): ?>
-                                <div class="set-row">
-                                    
-                                    <div class="active-input-group">
-                                        <?php if ($exercise['type'] === 'weight_reps'): ?>
-                                            <input type="number" step="0.5" class="workout-input" placeholder="kg">
-                                            <input type="number" class="workout-input" placeholder="reps">
-                                        
-                                        <?php elseif ($exercise['type'] === 'time_only'): ?>
-                                            <input type="text" class="workout-input" placeholder="mm:ss">
-                                        
-                                        <?php elseif ($exercise['type'] === 'distance_time' || $exercise['type'] === 'time_distance'): ?>
-                                            <input type="number" step="0.1" class="workout-input" placeholder="km">
-                                            <input type="text" class="workout-input" placeholder="time">
-                                        
-                                        <?php else: ?>
-                                            <input type="number" class="workout-input" placeholder="reps">
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <input type="checkbox" class="check-box">
-                                </div>
-                            <?php endfor; ?>
-                        </td>
-
-                    </tr>
-                <?php endforeach; ?>
-
-            </tbody>
-        </table>
-    </form>
-
-    <div class="footer">
-        <button onclick="document.getElementById('workout-form').submit();" class="btn-primary">
-            FINISH WORKOUT
-        </button>
-    </div>
-
-</body>
--->
 
 <body>
 
@@ -194,110 +33,10 @@
             <thead>
                 <tr>
                     <th class="col-exercise">Exercise</th>
-                    
-                    <?php foreach($pastSessions as $session): ?>
-                        <th>
-                            <?= date('M d', strtotime($session['date'])); ?>
-                        </th>
-                    <?php endforeach; ?>
-
-                    <th class="col-today">TODAY</th>
-                </tr>
-            </thead>
-            <tbody>
-                
-                <?php foreach ($exercises as $exercise): ?>
-                    <tr>
-                        
-                        <td class="col-exercise">
-                            <div style="color: #38e07b; font-weight: 700; margin-bottom: 4px;">
-                                <?= htmlspecialchars($exercise['name']); ?>
-                            </div>
-                            <div style="font-size: 0.7rem; color: #888; text-transform: uppercase;">
-                                <?= $exercise['type']; ?>
-                            </div>
-                            <?php if($exercise['note']): ?>
-                                <div style="font-size: 0.75rem; color: #aaa; margin-top: 4px;">
-                                    <?= htmlspecialchars($exercise['note']); ?>
-                                </div>
-                            <?php endif; ?>
-                        </td>
-
-                        <?php foreach($pastSessions as $session): ?>
-                            <td>
-                                <?php for($i = 0; $i < $exercise['sets_count']; $i++): ?>
-                                    <div class="set-row">
-                                        <div class="history-value">
-                                            <?= $historyData[$exercise['relation_id']][$session['id']][$i] ?? '-'; ?>
-                                        </div>
-                                    </div>
-                                <?php endfor; ?>
-                            </td>
-                        <?php endforeach; ?>
-
-                        <td class="col-today">
-                            <?php for($i = 1; $i <= $exercise['sets_count']; $i++): ?>
-                                <div class="set-row">
-                                    <div class="active-input-group">
-                                        <?php $baseName = "results[{$exercise['relation_id']}][{$i}]"; ?>
-
-                                        <?php if ($exercise['type'] === 'weight_reps'): ?>
-                                            <input type="number" step="0.5" name="<?= $baseName ?>[weight]" class="workout-input" placeholder="kg">
-                                            <input type="number" name="<?= $baseName ?>[reps]" class="workout-input" placeholder="reps">
-                                        <?php elseif ($exercise['type'] === 'time_only'): ?>
-                                            <input type="text" name="<?= $baseName ?>[time]" class="workout-input" placeholder="mm:ss">
-                                        <?php elseif ($exercise['type'] === 'reps_only'): ?>
-                                            <input type="number" name="<?= $baseName ?>[reps]" class="workout-input" placeholder="reps">
-                                        <?php elseif ($exercise['type'] === 'distance_time' || $exercise['type'] === 'time_distance'): ?>
-                                            <input type="number" step="0.1" name="<?= $baseName ?>[dist]" class="workout-input" placeholder="km">
-                                            <input type="text" name="<?= $baseName ?>[time]" class="workout-input" placeholder="time">
-                                        <?php else: ?>
-                                            <input type="number" name="<?= $baseName ?>[reps]" class="workout-input" placeholder="reps">
-                                        <?php endif; ?>
-                                    </div>
-                                    <input type="checkbox" class="check-box">
-                                </div>
-                            <?php endfor; ?>
-                        </td>
-
-                    </tr>
-                <?php endforeach; ?>
-
-                <tr style="border-top: 2px solid rgba(255,255,255,0.1);">
-                    <td class="col-exercise" style="background-color: #0e1811;">
-                        <span style="color: rgba(255,255,255,0.5); font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">
-                            SESSION NOTES
-                        </span>
-                    </td>
 
                     <?php foreach($pastSessions as $session): ?>
-                        <td style="vertical-align: top; padding: 1rem;">
-                            <?php if(!empty($historyNotes[$session['id']])): ?>
-                                <div style="font-size: 0.75rem; color: #ccc; font-style: italic; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; border-left: 2px solid #555;">
-                                    "<?= htmlspecialchars($historyNotes[$session['id']]); ?>"
-                                </div>
-                            <?php else: ?>
-                                <span style="font-size: 2rem; color: rgba(255,255,255,0.05); display: block; text-align: center;">-</span>
-                            <?php endif; ?>
-                        </td>
-                    <?php endforeach; ?>
-
-                    <td class="col-today" style="vertical-align: middle; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.8rem;">
-                        (Fill note below)
-                    </td>
-                </tr>
-
-            </tbody>
-        </table>
-<!--
-        <table>
-            <thead>
-                <tr>
-                    <th class="col-exercise">Exercise</th>
-
-                    <?php foreach($historyDates as $date): ?>
                     <th>
-                        <?= date('M d', strtotime($date)); ?>
+                        <?= date('M d', strtotime($session['date'])); ?>
                     </th>
                     <?php endforeach; ?>
 
@@ -308,7 +47,6 @@
 
                 <?php foreach ($exercises as $exercise): ?>
                 <tr>
-
                     <td class="col-exercise">
                         <div style="color: #38e07b; font-weight: 700; margin-bottom: 4px;">
                             <?= htmlspecialchars($exercise['name']); ?>
@@ -322,12 +60,13 @@
                         </div>
                         <?php endif; ?>
                     </td>
-                    <?php foreach($historyDates as $date): ?>
+
+                    <?php foreach($pastSessions as $session): ?>
                     <td>
                         <?php for($i = 0; $i < $exercise['sets_count']; $i++): ?>
                         <div class="set-row">
                             <div class="history-value">
-                                <?= $historyData[$exercise['relation_id']][$date][$i] ?? '-'; ?>
+                                <?= $historyData[$exercise['relation_id']][$session['id']][$i] ?? '-'; ?>
                             </div>
                         </div>
                         <?php endfor; ?>
@@ -338,91 +77,79 @@
                         <?php for($i = 1; $i <= $exercise['sets_count']; $i++): ?>
                         <div class="set-row">
                             <div class="active-input-group">
-
-                                <?php 
-                                            // Generowanie nazwy inputa: results[relation_id][seria][typ]
-                                            $baseName = "results[{$exercise['relation_id']}][{$i}]"; 
-                                        ?>
+                                <?php $baseName = "results[{$exercise['relation_id']}][{$i}]"; ?>
 
                                 <?php if ($exercise['type'] === 'weight_reps'): ?>
                                 <input type="number" step="0.5" name="<?= $baseName ?>[weight]" class="workout-input"
                                     placeholder="kg">
                                 <input type="number" name="<?= $baseName ?>[reps]" class="workout-input"
                                     placeholder="reps">
-
                                 <?php elseif ($exercise['type'] === 'time_only'): ?>
                                 <input type="text" name="<?= $baseName ?>[time]" class="workout-input"
                                     placeholder="mm:ss">
-
                                 <?php elseif ($exercise['type'] === 'reps_only'): ?>
                                 <input type="number" name="<?= $baseName ?>[reps]" class="workout-input"
                                     placeholder="reps">
-
                                 <?php elseif ($exercise['type'] === 'distance_time' || $exercise['type'] === 'time_distance'): ?>
                                 <input type="number" step="0.1" name="<?= $baseName ?>[dist]" class="workout-input"
                                     placeholder="km">
                                 <input type="text" name="<?= $baseName ?>[time]" class="workout-input"
                                     placeholder="time">
-
                                 <?php else: ?>
                                 <input type="number" name="<?= $baseName ?>[reps]" class="workout-input"
                                     placeholder="reps">
                                 <?php endif; ?>
-
                             </div>
                             <input type="checkbox" class="check-box">
                         </div>
                         <?php endfor; ?>
                     </td>
-
                 </tr>
                 <?php endforeach; ?>
-                <tr style="border-top: 2px solid rgba(255,255,255,0.1);">
-
-                    <td class="col-exercise" style="background-color: #0e1811;">
-                        <span
-                            style="color: rgba(255,255,255,0.5); font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">
+<tr style="border-top: 2px solid rgba(255,255,255,0.1);">
+                    
+                    <td class="col-exercise" style="background-color: #0e1811; vertical-align: top;">
+                        <span style="color: rgba(255,255,255,0.5); font-weight: 700; font-size: 0.8rem; text-transform: uppercase;">
                             SESSION NOTES
                         </span>
-                        <div style="font-size: 0.7rem; color: #666; margin-top: 4px;">
-                            See how you felt
-                        </div>
                     </td>
+<?php foreach($pastSessions as $session): ?>
+                        <td style="vertical-align: top; padding: 0.5rem;">
+                            <div style="display: flex; flex-direction: column; justify-content: space-between; align-items: center; height: 100%; min-height: 90px;">
+                                
+                                <div style="width: 100%;">
+                                    <?php if(!empty($historyNotes[$session['id']])): ?>
+                                        <div style="font-size: 0.75rem; color: #ccc; font-style: italic; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; border-left: 2px solid #555; margin-bottom: 10px;">
+                                            "<?= htmlspecialchars($historyNotes[$session['id']]); ?>"
+                                        </div>
+                                    <?php else: ?>
+                                        <div style="text-align: center; opacity: 0.1; font-size: 1.5rem; margin-bottom: 10px;">-</div>
+                                    <?php endif; ?>
+                                </div>
 
-                    <?php foreach($historyDates as $date): ?>
-                    <td style="vertical-align: top; padding: 1rem;">
-                        <?php if(!empty($historyNotes[$date])): ?>
-                        <div
-                            style="font-size: 0.75rem; color: #ccc; font-style: italic; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; border-left: 2px solid #555;">
-                            "
-                            <?= htmlspecialchars($historyNotes[$date]); ?>"
-                        </div>
-                        <?php else: ?>
-                        <span
-                            style="font-size: 2rem; color: rgba(255,255,255,0.05); display: block; text-align: center;">-</span>
-                        <?php endif; ?>
-                    </td>
+                                <button type="button" 
+                                        class="btn-delete"
+                                        data-id="<?= $session['id']; ?>"
+                                        onclick="prepareDelete(this)"
+                                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; cursor: pointer; color: #ef4444; transition: all 0.2s;" 
+                                        title="Delete Session">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                                </button>
+
+                            </div>
+                        </td>
                     <?php endforeach; ?>
 
-                    <td class="col-today"
-                        style="vertical-align: middle; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.8rem;">
-                        (Fill note below)
+                    <td class="col-today" style="vertical-align: top; padding: 0.5rem;">
+                        <textarea name="user_note" placeholder="Note (e.g. felt strong...)"
+                            style="width: 100%; height: 100px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 6px; font-family: inherit; font-size: 0.85rem; resize: none; box-sizing: border-box;"></textarea>
                     </td>
 
                 </tr>
-
             </tbody>
         </table>
-    -->
-
-        <div style="padding: 1rem; background: rgba(18,32,23,0.95); border-top: 1px solid rgba(255,255,255,0.1);">
-            <label
-                style="display: block; color: var(--primary-color); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase;">
-                Session Note
-            </label>
-            <textarea name="user_note" placeholder="How was the workout? (e.g. Felt strong, Knee pain...)"
-                style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 8px; font-family: inherit; font-size: 0.9rem; min-height: 80px; resize: vertical;"></textarea>
-        </div>
+        
+       
 
     </form>
 
@@ -431,6 +158,27 @@
             FINISH WORKOUT
         </button>
     </div>
+    <form id="delete-session-form" action="delete-session" method="POST" style="display: none;">
+        <input type="hidden" name="plan_id" value="<?= $plan['id']; ?>">
+        <input type="hidden" name="session_id" id="delete-session-id-input">
+    </form>
+
+    <script>
+        function prepareDelete(buttonElement) {
+            // 1. Pobieramy ID z atrybutu data-id przycisku (to jest bezpieczne)
+            const sessionId = buttonElement.getAttribute('data-id');
+
+            // 2. Pytamy użytkownika
+            if (confirm('Delete this workout session permanently?')) {
+                
+                // 3. Wstawiamy ID do ukrytego formularza
+                document.getElementById('delete-session-id-input').value = sessionId;
+                
+                // 4. Wysyłamy formularz
+                document.getElementById('delete-session-form').submit();
+            }
+        }
+    </script>`
 
 </body>
 

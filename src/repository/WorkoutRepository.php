@@ -274,4 +274,13 @@ class WorkoutRepository extends Repository
         $stmt->execute($sessionIds);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function deleteSession(int $sessionId): void
+    {
+        $stmt = $this->database->connect()->prepare('
+            DELETE FROM workout_sessions WHERE id = :id
+        ');
+        $stmt->bindParam(':id', $sessionId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
 }

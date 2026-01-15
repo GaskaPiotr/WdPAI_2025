@@ -281,4 +281,23 @@ class PlanController extends AppController {
             die("Error saving workout: " . $e->getMessage());
         }
     }
+
+    public function deleteSession()
+    {
+        if (!$this->isPost()) {
+            header("Location: /dashboard");
+            return;
+        }
+
+        $sessionId = $_POST['session_id'];
+        $planId = $_POST['plan_id']; // Potrzebne do przekierowania z powrotem
+
+        if ($sessionId) {
+            $this->workoutRepository->deleteSession((int)$sessionId);
+        }
+
+        // Wracamy do widoku "Start Workout" tego konkretnego planu
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/start-workout?id={$planId}");
+    }
 }
