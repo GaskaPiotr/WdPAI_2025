@@ -3,9 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>
-        <?= htmlspecialchars($plan['name']); ?> - Details
-    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($plan['name']); ?> - Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="/public/styles/base.css">
@@ -22,7 +21,13 @@
             <span>FitTrack</span>
         </div>
         <div class="user-section">
-            <a href="/dashboard" class="logout-link">Back to Dashboard</a>
+            <?php
+                $backLink = "/dashboard"; 
+                if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $plan['user_id']) {
+                    $backLink = "/trainee-dashboard?id=" . $plan['user_id'];
+                }
+            ?>
+            <a href="<?= $backLink; ?>" class="logout-link">Back to dashboard</a>
         </div>
     </header>
 
@@ -38,14 +43,14 @@
         <form action="add-exercise" method="POST" class="add-exercise-form">
             <input type="hidden" name="plan_id" value="<?= $plan['id']; ?>">
 
-            <div class="form-group" style="flex: 2;">
+            <div class="form-group wide">
                 <label>Exercise Name</label>
                 <input list="exercises_list" id="exercise_input" name="exercise_name" type="text"
                     placeholder="Start typing..." required autocomplete="off">
                 <datalist id="exercises_list">
                     <?php foreach($allExercises as $ex): ?>
                     <option value="<?= htmlspecialchars($ex['name']); ?>">
-                        <?php endforeach; ?>
+                    <?php endforeach; ?>
                 </datalist>
             </div>
 
@@ -59,21 +64,20 @@
                 </select>
             </div>
 
-            <div class="form-group" id="existing_type_container" style="display: none;">
+            <div class="form-group hidden" id="existing_type_container">
                 <label>Detected Type</label>
-                <div
-                    style="padding: 0.8rem; background: rgba(56, 224, 123, 0.1); border: 1px solid var(--primary-color); border-radius: 0.5rem; color: var(--primary-color); font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
+                <div class="detected-type-badge">
                     <span class="material-symbols-outlined" id="type_icon" style="font-size: 20px;">check_circle</span>
                     <span id="type_label">Weight & Reps</span>
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group narrow">
                 <label>Sets</label>
-                <input type="number" name="sets" value="3" min="1" required style="width: 80px;">
+                <input type="number" name="sets" value="3" min="1" required>
             </div>
 
-            <div class="form-group" style="flex: 2;">
+            <div class="form-group wide">
                 <label>Note</label>
                 <input type="text" name="note" placeholder="Target details...">
             </div>
@@ -81,11 +85,9 @@
             <button type="submit" class="btn-primary">Add</button>
         </form>
 
-
-
         <div class="exercise-list">
             <?php if(empty($exercises)): ?>
-            <div class="empty-state" style="padding: 2rem;">
+            <div class="empty-state">
                 No exercises yet. Use the form above to build your plan.
             </div>
             <?php else: ?>
@@ -93,38 +95,29 @@
             <?php foreach($exercises as $exercise): ?>
             <div class="exercise-card">
                 <div class="exercise-info">
-                    <h3>
-                        <?= htmlspecialchars($exercise['name']); ?>
-                    </h3>
+                    <h3><?= htmlspecialchars($exercise['name']); ?></h3>
+                    
                     <div class="exercise-meta">
-
-                        <span class="meta-item" title="Type"
-                            style="display: flex; align-items: center; gap: 5px; margin-right: 15px;">
+                        <span class="meta-item" title="Type">
                             <?php if($exercise['type'] === 'time_only'): ?>
-                            <span class="material-symbols-outlined"
-                                style="font-size: 18px; color: #3498db;">timer</span> Time
-
+                                <span class="material-symbols-outlined type-icon time">timer</span> Time
                             <?php elseif($exercise['type'] === 'reps_only'): ?>
-                            <span class="material-symbols-outlined"
-                                style="font-size: 18px; color: #9b59b6;">accessibility_new</span> Reps
-
+                                <span class="material-symbols-outlined type-icon reps">accessibility_new</span> Reps
                             <?php elseif($exercise['type'] === 'time_distance' || $exercise['type'] === 'distance_time'): ?>
-                            <span class="material-symbols-outlined"
-                                style="font-size: 18px; color: #e74c3c;">directions_run</span> Cardio
-
+                                <span class="material-symbols-outlined type-icon cardio">directions_run</span> Cardio
                             <?php else: ?>
-                            <span class="material-symbols-outlined"
-                                style="font-size: 18px; color: #e67e22;">fitness_center</span> Weight
+                                <span class="material-symbols-outlined type-icon weight">fitness_center</span> Weight
                             <?php endif; ?>
                         </span>
+
                         <span class="meta-item" title="Sets">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">repeat</span>
+                            <span class="material-symbols-outlined icon-small">repeat</span>
                             <?= $exercise['sets_count']; ?> Sets
                         </span>
 
                         <?php if($exercise['note']): ?>
                         <span class="meta-item" title="Note">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">description</span>
+                            <span class="material-symbols-outlined icon-small">description</span>
                             <?= htmlspecialchars($exercise['note']); ?>
                         </span>
                         <?php endif; ?>
@@ -134,7 +127,7 @@
                 <form action="delete-exercise" method="POST" onsubmit="return confirm('Remove this exercise?');">
                     <input type="hidden" name="relation_id" value="<?= $exercise['relation_id']; ?>">
                     <input type="hidden" name="plan_id" value="<?= $plan['id']; ?>">
-                    <button type="submit" class="btn-text" style="color: #ef4444;">
+                    <button type="submit" class="btn-icon-delete">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
                 </form>
@@ -145,10 +138,11 @@
         </div>
 
     </main>
-    <div id="exercises-data" data-exercises="<?= htmlspecialchars(json_encode($allExercises), ENT_QUOTES, 'UTF-8'); ?>"
-        style="display: none;">
+
+    <div id="exercises-data" 
+         class="hidden" 
+         data-exercises="<?= htmlspecialchars(json_encode($allExercises), ENT_QUOTES, 'UTF-8'); ?>">
     </div>
 
 </body>
-
 </html>

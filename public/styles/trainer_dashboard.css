@@ -1,0 +1,282 @@
+/* --- UI COMPONENTS (Navbar & Layout) --- */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-dark);
+    padding: 1rem 2rem;
+    border-bottom: 0.0625rem solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.2);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.logo-icon { color: var(--primary-color); font-size: 2rem; }
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.logout-link {
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.logout-link:hover { color: var(--primary-color); }
+
+.user-avatar {
+    width: 2.25rem; height: 2.25rem;
+    border-radius: 50%;
+    border: 0.125rem solid var(--primary-color);
+}
+
+.dashboard-container {
+    max-width: 62.5rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* --- PAGE HEADER & FILTERS --- */
+.page-header { margin-bottom: 2rem; }
+.page-title { font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+.filters-bar { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+
+.search-wrapper {
+    flex: 1;
+    background-color: var(--card-dark);
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    border-radius: 0.5rem;
+    height: 3.125rem;
+}
+
+.search-icon { color: var(--text-gray); }
+
+.search-wrapper input {
+    background: transparent; border: none; color: white;
+    width: 100%; height: 100%; margin-left: 0.5rem; font-size: 1rem;
+}
+.search-wrapper input:focus { outline: none; }
+
+/* --- TRAINEE TABLE STYLES --- */
+.table-container {
+    background-color: var(--card-dark);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.1);
+}
+
+.table-header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 0.0625rem solid var(--border-color);
+}
+
+.table-title { font-size: 1.25rem; font-weight: 700; color: white; }
+.table-subtitle { font-size: 0.9rem; color: var(--text-gray); margin-top: 0.25rem; }
+
+/* Przycisk Add Trainee */
+.btn-add {
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.btn-add:hover { transform: scale(1.02); }
+
+/* Sama tabela */
+.data-table { width: 100%; border-collapse: collapse; }
+
+.data-table th {
+    text-align: left;
+    padding: 1rem 1.5rem;
+    background-color: rgba(0,0,0,0.2);
+    color: var(--text-gray);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.data-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 0.0625rem solid var(--border-color);
+    color: var(--text-white);
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+/* --- FIX DESKTOP ALIGNMENT --- */
+/* Wymuszamy wyrównanie do prawej dla ostatniej kolumny (Actions) */
+.data-table th:last-child,
+.data-table td:last-child {
+    text-align: right;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover { background-color: var(--hover-bg); }
+
+/* User Cell (Avatar + Name) */
+.user-cell { display: flex; align-items: center; gap: 1rem; }
+
+.user-avatar-small {
+    width: 2rem; height: 2rem;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    display: flex;
+    align-items: center; justify-content: center;
+    font-weight: bold; font-size: 0.8rem;
+    flex-shrink: 0;
+}
+.user-name { font-weight: 500; }
+.user-email { font-size: 0.8rem; color: var(--text-gray); }
+
+/* Badges (Status) */
+.badge {
+    font-size: 0.7rem; padding: 0.125rem 0.5rem; border-radius: 0.25rem;
+    background-color: var(--card-dark); border: 0.0625rem solid var(--text-gray);
+    display: inline-block; /* Ważne żeby się nie rozjeżdżało */
+}
+.badge.active { background-color: var(--primary-color); color: var(--bg-dark); border: none; }
+.badge.pending { background-color: #F5A623; color: black; border: none; }
+
+/* Actions */
+.btn-text {
+    background: none; border: none;
+    color: var(--primary-color);
+    cursor: pointer; font-weight: 500; font-size: 0.9rem;
+    padding: 0.5rem; 
+    transition: opacity 0.2s;
+    text-decoration: none;
+    /* FIX: Usuwamy marginy, żeby align right działał idealnie */
+    display: inline-block;
+}
+.btn-text:hover { opacity: 0.8; text-decoration: underline; }
+
+/* --- UTILITIES --- */
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-gray { color: var(--text-gray); }
+.mt-1 { margin-top: 1rem; }
+.p-3 { padding: 3rem; }
+
+.empty-state-icon { font-size: 3rem; color: var(--text-gray); }
+
+/* ========================================= */
+/* --- RESPONSYWNOŚĆ (MOBILE) --- */
+/* ========================================= */
+
+@media (max-width: 48rem) {
+
+    .navbar { padding: 0.75rem 1rem; }
+    .logo-section span { font-size: 1.1rem; }
+    .logo-icon { font-size: 1.5rem; }
+    .user-section { gap: 0.75rem; }
+
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .btn-add { width: 100%; justify-content: center; padding: 0.8rem; }
+
+    /* Transformacja Tabeli w Karty */
+    .data-table thead { display: none; }
+
+    .data-table, .data-table tbody, .data-table tr, .data-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .data-table tr {
+        margin-bottom: 1rem;
+        border-bottom: 0.0625rem solid var(--border-color);
+        padding-bottom: 1rem;
+        
+        /* --- FIX MOBILE STATUS VISIBILITY --- */
+        position: relative; /* TO NAPRAWIA ZNIKAJĄCY STATUS */
+    }
+
+    .data-table td {
+        padding: 0.5rem 1.5rem;
+        border: none;
+        text-align: left; 
+        
+        /* Resetujemy fix desktopowy dla mobile, żeby tu było po lewej */
+        text-align: left !important; 
+    }
+
+    /* Wiersz z awatarem i imieniem */
+    .data-table td:nth-child(1) {
+        padding-top: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        /* Zrób miejsce na badge statusu po prawej */
+        padding-right: 5rem; 
+    }
+
+    /* Wiersz z emailem */
+    .data-table td:nth-child(2) {
+        color: var(--text-gray);
+        padding-top: 0;
+        padding-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Wiersz ze statusem - pozycja absolutna */
+    .data-table td:nth-child(3) {
+        position: absolute;
+        top: 1rem;
+        right: 1rem; /* Trochę bliżej krawędzi */
+        width: auto;
+        padding: 0;
+        text-align: right !important;
+    }
+
+    /* Wiersz z akcjami */
+    .data-table td:nth-child(4) {
+        margin-top: 0.5rem;
+        padding: 0 1.5rem;
+        text-align: center !important; /* Przycisk na środku karty */
+    }
+
+    .btn-text {
+        display: block;
+        width: 100%;
+        padding: 0.8rem;
+        background-color: rgba(56, 224, 123, 0.1);
+        border-radius: 0.5rem;
+        text-align: center;
+        /* Na mobile chcemy żeby wyglądał jak guzik, nie link */
+        text-decoration: none !important;
+    }
+}

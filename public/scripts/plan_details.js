@@ -1,96 +1,71 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     
-    // --- 1. KONFIGURACJA SŁOWNIKÓW ---
-    // Zaktualizowałem to, żeby pasowało do Twojej bazy (masz tam 'time_distance')
-    const typeLabels = {
-        'weight_reps': 'Weight & Reps',
-        'reps_only': 'Reps Only',
-        'time_only': 'Time / Duration',
-        'time_distance': 'Cardio (Time & Dist)', // <--- TO PASUJE DO TWOJEJ BAZY
-        'distance_time': 'Cardio (Dist & Time)'  // Zostawiam na wszelki wypadek
-    };
+    // 1. Pobieramy elementy DOM
+    const exerciseInput = document.getElementById('exercise_input');
+    const typeSelectContainer = document.getElementById('type_select_container');
+    const existingTypeContainer = document.getElementById('existing_type_container');
+    const typeSelect = document.getElementById('type_select');
+    
+    // Elementy wewnątrz Badge'a (wykryty typ)
+    const typeLabel = document.getElementById('type_label');
+    const typeIcon = document.getElementById('type_icon');
 
+    // 2. Pobieramy dane o ćwiczeniach z ukrytego diva (dataset)
+    const dataContainer = document.getElementById('exercises-data');
+    if (!dataContainer) return; // Zabezpieczenie
+    
+    // Parsujemy JSON z PHP
+    const allExercises = JSON.parse(dataContainer.dataset.exercises || '[]');
+
+    // Mapa ikon dla typów (żeby JS wiedział jaką ikonkę wstawić)
     const typeIcons = {
         'weight_reps': 'fitness_center',
         'reps_only': 'accessibility_new',
         'time_only': 'timer',
-        'time_distance': 'directions_run',
-        'distance_time': 'directions_run'
+        'distance_time': 'directions_run',
+        'time_distance': 'directions_run'
     };
 
-    // --- 2. POBIERANIE I PARSOWANIE DANYCH ---
-    let dbExercises = {};
-    const dataElement = document.getElementById('exercises-data');
+    // Mapa czytelnych nazw dla typów
+    const typeLabels = {
+        'weight_reps': 'Weight & Reps',
+        'reps_only': 'Reps Only',
+        'time_only': 'Time based',
+        'distance_time': 'Distance & Time',
+        'time_distance': 'Distance & Time'
+    };
 
-    if (dataElement) {
-        try {
-            // Używamy .dataset.exercises - przeglądarka automatycznie zamieni &quot; na "
-            let rawData = dataElement.dataset.exercises;
+    // 3. Nasłuchujemy wpisywania w input
+    exerciseInput.addEventListener('input', function () {
+        const inputValue = this.value.trim().toLowerCase();
+        
+        // Szukamy czy wpisana nazwa istnieje w bazie (case-insensitive)
+        const match = allExercises.find(ex => ex.name.toLowerCase() === inputValue);
+
+        if (match) {
+            // --- SCENARIUSZ: ĆWICZENIE ISTNIEJE (POKAŻ BADGE) ---
             
-            console.log("1. Pobrane dane (surowe):", rawData); // SPRAWDŹ KONSOLĘ (F12)
+            // 1. Ukryj selecta, Pokaż badge (operując na klasach .hidden)
+            typeSelectContainer.classList.add('hidden');
+            existingTypeContainer.classList.remove('hidden');
 
-            if (rawData) {
-                const exercisesArray = JSON.parse(rawData);
-                console.log("2. Sparsowana tablica:", exercisesArray); // SPRAWDŹ KONSOLĘ
+            // 2. Zaktualizuj tekst i ikonę w badge'u
+            const type = match.type;
+            typeLabel.textContent = typeLabels[type] || type;
+            typeIcon.textContent = typeIcons[type] || 'help';
 
-                exercisesArray.forEach(exercise => {
-                    if (exercise.name) {
-                        // Klucz to nazwa małymi literami, Wartość to typ
-                        dbExercises[exercise.name.toLowerCase()] = exercise.type;
-                    }
-                });
-                
-                console.log("3. Gotowa mapa do szukania:", dbExercises); // SPRAWDŹ KONSOLĘ
-            }
-        } catch (e) {
-            console.error("Błąd krytyczny JS podczas czytania danych:", e);
-        }
-    } else {
-        console.error("Nie znaleziono elementu div#exercises-data!");
-    }
-
-    // --- 3. OBSŁUGA INTERFEJSU ---
-    const input = document.getElementById('exercise_input');
-    const selectContainer = document.getElementById('type_select_container');
-    const displayContainer = document.getElementById('existing_type_container');
-    const displayLabel = document.getElementById('type_label');
-    const displayIcon = document.getElementById('type_icon');
-
-    if (!input) {
-        console.warn("Nie znaleziono inputa exercise_input");
-        return;
-    }
-
-    input.addEventListener('input', function() {
-        // Usuwamy białe znaki i zamieniamy na małe litery
-        const val = this.value.trim().toLowerCase();
-        console.log("Wpisano:", val); // Debugowanie wpisywania
-
-        if (dbExercises.hasOwnProperty(val)) {
-            // === ZNALEZIONO ===
-            console.log("-> Znaleziono w bazie! Typ:", dbExercises[val]);
-            
-            const typeKey = dbExercises[val];
-
-            // Ukryj select
-            if(selectContainer) selectContainer.style.display = 'none';
-            
-            // Pokaż badge
-            if(displayContainer) {
-                displayContainer.style.display = 'flex'; // Użyj flex dla ładnego wyglądu
-                displayLabel.textContent = typeLabels[typeKey] || typeKey; // Użyj ładnej nazwy lub klucza
-                displayIcon.textContent = typeIcons[typeKey] || 'check_circle';
-            }
+            // 3. WAŻNE: Ustaw wartość w ukrytym selectcie, żeby formularz wysłał poprawny typ!
+            typeSelect.value = type;
 
         } else {
-            // === NIE ZNALEZIONO (NOWE) ===
-            // console.log("-> Nowe ćwiczenie");
-
-            // Pokaż select
-            if(selectContainer) selectContainer.style.display = 'block';
+            // --- SCENARIUSZ: NOWE ĆWICZENIE (POKAŻ SELECT) ---
             
-            // Ukryj badge
-            if(displayContainer) displayContainer.style.display = 'none';
+            // 1. Pokaż selecta, Ukryj badge
+            typeSelectContainer.classList.remove('hidden');
+            existingTypeContainer.classList.add('hidden');
+            
+            // Opcjonalnie: można zresetować select do domyślnej wartości, jeśli chcesz
+            // typeSelect.value = 'weight_reps'; 
         }
     });
 });

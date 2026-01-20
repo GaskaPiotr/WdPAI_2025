@@ -1,0 +1,303 @@
+/* --- LAYOUT & NAVBAR --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-dark);
+    padding: 1rem 2rem;
+    border-bottom: 0.0625rem solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.2);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.logo-icon { color: var(--primary-color); font-size: 2rem; }
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.logout-link {
+    color: var(--text-gray);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.logout-link:hover { color: var(--primary-color); }
+
+.user-avatar {
+    width: 2.25rem; height: 2.25rem;
+    border-radius: 50%;
+    border: 0.125rem solid var(--primary-color);
+}
+
+.dashboard-container {
+    max-width: 62.5rem;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.page-header { margin-bottom: 2rem; }
+.page-title { font-size: 2rem; font-weight: 700; }
+
+/* --- NOTIFICATIONS (Dropdown) --- */
+.notifications-wrapper {
+    position: relative;
+    cursor: pointer;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.notification-icon {
+    color: var(--text-white);
+    transition: color 0.2s;
+}
+.notifications-wrapper:hover .notification-icon { color: var(--primary-color); }
+
+.notification-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0.625rem;
+    height: 0.625rem;
+    background-color: #f87171;
+    border-radius: 50%;
+    border: 0.125rem solid var(--card-dark); /* Obramowanie żeby odciąć od ikony */
+}
+
+/* Kontener dropdowna */
+.notification-dropdown {
+    display: none; /* JS to zmieni na block */
+    position: absolute;
+    top: 150%;
+    right: -1rem; /* Lekkie przesunięcie */
+    width: 18.75rem; /* 300px */
+    background-color: var(--card-dark);
+    border: 0.0625rem solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.95rem rgba(0,0,0,0.5);
+    z-index: 200;
+    overflow: hidden;
+}
+
+.notification-header {
+    padding: 1rem;
+    border-bottom: 0.0625rem solid var(--border-color);
+    font-weight: bold;
+    background: rgba(255,255,255,0.02);
+}
+
+.notification-list {
+    max-height: 18.75rem;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 1rem;
+    border-bottom: 0.0625rem solid rgba(255,255,255,0.1);
+}
+.notification-item:last-child { border-bottom: none; }
+
+.notification-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-accept, .btn-decline {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.btn-accept {
+    background: var(--primary-color);
+    border: none;
+    color: var(--bg-dark);
+}
+
+.btn-decline {
+    background: rgba(63, 21, 21, 0.5);
+    color: #f87171;
+    border: 0.0625rem solid #f87171;
+}
+
+.btn-accept:hover, .btn-decline:hover { opacity: 0.8; }
+
+.empty-notification {
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-gray);
+    font-size: 0.9rem;
+}
+
+/* --- WORKOUT LIST & CARDS --- */
+.workout-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 5rem; /* Miejsce na FAB */
+}
+
+.workout-wrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.workout-card {
+    flex: 1; /* Zajmij całe miejsce */
+    display: flex;
+    align-items: center;
+    background-color: var(--card-dark);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, border 0.2s;
+    border: 0.0625rem solid transparent;
+}
+.workout-card:hover {
+    transform: translateY(-0.125rem);
+    border-color: var(--primary-color);
+}
+
+.icon-box {
+    width: 3.125rem; height: 3.125rem; /* 50px */
+    background-color: rgba(56, 224, 123, 0.15);
+    border-radius: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.card-info { flex: 1; min-width: 0; }
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.card-subtitle { color: var(--text-gray); font-size: 0.9rem; }
+.card-date { color: var(--text-gray); font-size: 0.9rem; white-space: nowrap; }
+
+/* Side Buttons (Play / Delete) */
+.btn-side {
+    width: 5rem; /* ZMIANA: Zwiększono z 3.125rem na 5rem (ok. 80px) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-start-side {
+    background-color: rgba(56, 224, 123, 0.1);
+    border: 0.0625rem solid var(--primary-color);
+    color: var(--primary-color);
+}
+.btn-start-side:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    transform: scale(1.05);
+}
+
+.btn-delete-side {
+    background-color: rgba(63, 21, 21, 0.4);
+    border: 0.0625rem solid #5c2b2b;
+    color: #ef4444;
+}
+.btn-delete-side:hover {
+    background-color: #7f1d1d;
+    color: white;
+    border-color: #ef4444;
+    transform: scale(1.05);
+}
+
+/* FAB (Floating Action Button) */
+.fab-btn {
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 3.75rem; height: 3.75rem;
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 0.25rem 0.95rem rgba(56, 224, 123, 0.4);
+    transition: transform 0.2s;
+    z-index: 90;
+}
+.fab-btn:hover { transform: scale(1.1); }
+
+.empty-state { text-align: center; padding: 4rem 0; color: var(--text-gray); }
+
+/* ========================================= */
+/* --- RESPONSYWNOŚĆ (MOBILE) --- */
+/* ========================================= */
+
+@media (max-width: 48rem) { /* 768px */
+    .navbar { padding: 0.75rem 1rem; }
+    .logo-section span { font-size: 1.1rem; }
+    .user-section { gap: 1rem; }
+    
+    /* Dropdown powiadomień na całą szerokość ekranu */
+    .notification-dropdown {
+        right: -3rem; /* Przesunięcie żeby wycentrować względem ekranu */
+        width: 90vw;
+        max-width: 20rem;
+    }
+
+    /* Układ kart */
+    .workout-wrapper {
+        flex-wrap: wrap; /* Pozwól elementom spadać */
+        gap: 0.75rem;
+    }
+
+    .workout-card {
+        width: 100%; /* Karta na całą szerokość */
+        flex: 1 1 100%;
+        margin-right: 0;
+    }
+
+    /* Przyciski Play i Delete lądują pod spodem, obok siebie */
+    .btn-side {
+        width: auto;
+        flex: 1; /* Dzielą się miejscem po równo */
+        height: 3rem; /* Większe pod palec */
+        border-radius: 0.5rem; /* Mniejsze zaokrąglenie wygląda lepiej w prostokącie */
+    }
+
+    /* Ukryj datę na karcie jeśli jest za ciasno, lub zostaw */
+    .card-date { display: none; } 
+}

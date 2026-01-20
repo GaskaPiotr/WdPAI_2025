@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <link rel="stylesheet" href="public/styles/base.css">
-    <link rel="stylesheet" href="public/styles/dashboard.css">
+    <link rel="stylesheet" href="public/styles/trainer_dashboard.css">
 </head>
 
 <body>
@@ -34,7 +34,7 @@
 
             <div class="filters-bar">
                 <div class="search-wrapper">
-                    <span class="material-symbols-outlined" style="color: var(--text-gray);">search</span>
+                    <span class="material-symbols-outlined search-icon">search</span>
                     <input type="text" placeholder="Search trainees...">
                 </div>
             </div>
@@ -59,16 +59,15 @@
                             <th>Trainee</th>
                             <th>Email</th>
                             <th>Status</th>
-                            <th style="text-align: right;">Actions</th>
+                            <th class="text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if(empty($trainees)): ?>
                         <tr>
-                            <td colspan="4" style="text-align: center; padding: 3rem;">
-                                <span class="material-symbols-outlined"
-                                    style="font-size: 3rem; color: var(--text-gray);">group_off</span>
-                                <p style="color: var(--text-gray); margin-top: 1rem;">No trainees assigned yet.</p>
+                            <td colspan="4" class="text-center p-3">
+                                <span class="material-symbols-outlined empty-state-icon">group_off</span>
+                                <p class="text-gray mt-1">No trainees assigned yet.</p>
                             </td>
                         </tr>
                         <?php else: ?>
@@ -80,7 +79,7 @@
                                     <div class="user-avatar-small">
                                         <?= strtoupper(substr($trainee['name'], 0, 1) . substr($trainee['surname'], 0, 1)); ?>
                                     </div>
-                                    <span style="font-weight: 500;">
+                                    <span class="user-name">
                                         <?= htmlspecialchars($trainee['name'] . " " . $trainee['surname']); ?>
                                     </span>
                                 </div>
@@ -92,17 +91,12 @@
                             </td>
                             <td>
                                 <?php if ($trainee['status'] === 'accepted'): ?>
-                                <span class="badge"
-                                    style="background-color: var(--primary-color); color: var(--bg-dark); border: none;">
-                                    Active
-                                </span>
+                                    <span class="badge active">Active</span>
                                 <?php else: ?>
-                                <span class="badge" style="background-color: #F5A623; color: black; border: none;">
-                                    Pending
-                                </span>
+                                    <span class="badge pending">Pending</span>
                                 <?php endif; ?>
                             </td>
-                            <td style="text-align: right;">
+                            <td class="text-right">
                                 <a href="/trainee-dashboard?id=<?= $trainee['id']; ?>" class="btn-text">Manage Plans</a>
                             </td>
                         </tr>
@@ -116,5 +110,4 @@
     </main>
 
 </body>
-
 </html>

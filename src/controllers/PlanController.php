@@ -275,7 +275,7 @@ class PlanController extends AppController {
             $this->workoutRepository->saveSession((int)$planId, $userNote, $results);
             
             $url = "http://$_SERVER[HTTP_HOST]";
-            header("Location: {$url}/dashboard");
+            header("Location: {$url}/start-workout?id={$planId}&saved=1");
 
         } catch (Exception $e) {
             die("Error saving workout: " . $e->getMessage());

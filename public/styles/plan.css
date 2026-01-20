@@ -1,4 +1,4 @@
-/* Stylizacja listy ćwiczeń */
+/* --- LISTA ĆWICZEŃ --- */
 .exercise-list {
     display: flex;
     flex-direction: column;
@@ -12,20 +12,26 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-left: 4px solid var(--primary-color);
-    /* Akcent z lewej */
+    border-left: 0.25rem solid var(--primary-color); /* 4px -> 0.25rem */
+    transition: transform 0.2s;
+}
+
+.exercise-card:hover {
+    transform: translateX(0.25rem);
 }
 
 .exercise-info h3 {
     margin: 0 0 0.5rem 0;
     font-size: 1.1rem;
+    color: var(--text-white);
 }
 
 .exercise-meta {
     color: var(--text-gray);
     font-size: 0.9rem;
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .meta-item {
@@ -34,115 +40,219 @@
     gap: 0.4rem;
 }
 
-/* Formularz dodawania (inline) */
+/* Kolory ikon (bez zmian, tylko rem w font-size) */
+.type-icon { font-size: 1.125rem; }      /* 18px */
+.type-icon.time { color: #3498db; }
+.type-icon.reps { color: #9b59b6; }
+.type-icon.cardio { color: #e74c3c; }
+.type-icon.weight { color: #e67e22; }
+.icon-small { font-size: 1rem; }         /* 16px */
+
+
+/* --- FORMULARZ DODAWANIA --- */
 .add-exercise-form {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--card-dark);
     padding: 1.5rem;
     border-radius: 1rem;
     margin-bottom: 2rem;
-    display: grid;
-    grid-template-columns: 2fr 1fr 2fr auto;
-    /* Układ kolumnowy */
-    gap: 1rem;
-    align-items: end;
-    /* Wyrównanie przycisków do dołu */
-}
-
-/* Na mobile zróbmy formularz pionowy */
-@media (max-width: 768px) {
-    .add-exercise-form {
-        grid-template-columns: 1fr;
-    }
-}
-
-.add-exercise-form {
-    background-color: var(--card-dark);
-    padding: 1.5rem;
-    border-radius: 1rem;
-    margin-bottom: 1rem;
-    display: flex;
-    /* Zmieniamy grid na flex z wrapem, bezpieczniej */
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: flex-end;
-    border: 1px solid var(--border-color);
-}
-
-.add-exercise-form .form-group {
-    flex: 1;
-    min-width: 150px;
-    /* Żeby pola nie były za wąskie */
-}
-
-/* Przycisk Add niech ma stałą szerokość */
-.add-exercise-form .btn-primary {
-    flex: 0 0 auto;
-    width: auto;
-    padding: 0.8rem 2rem;
-}
-
-.add-exercise-form {
-    background-color: var(--card-dark);
-    padding: 1.5rem;
-    border-radius: 1rem;
-    margin-bottom: 1rem;
+    border: 0.0625rem solid var(--border-color); /* 1px */
+    
+    /* Layout Flexbox */
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
     align-items: flex-end;
-    /* Wyrównanie do dołu */
-    border: 1px solid var(--border-color);
 }
 
 .form-group {
-    flex: 1;
-    min-width: 150px;
     display: flex;
     flex-direction: column;
-    /* Etykieta nad inputem */
+    /* Domyślna elastyczność: rośnij, kurcz się, baza auto */
+    flex: 1 1 auto;
+    /* Minimalna szerokość, żeby pola nie znikały na mobile */
+    min-width: 8rem; 
 }
+
+/* --- ZARZĄDZANIE SZEROKOŚCIĄ KOLUMN --- */
+
+/* Exercise Name & Note: Mają wysoki priorytet wzrostu (2) */
+.form-group.wide { 
+    flex: 2 1 12rem; 
+} 
+
+/* Sets: Bardzo wąskie, nie rośnie za bardzo (0) */
+.form-group.narrow { 
+    flex: 0 0 4rem; /* Zamiast 100px dajemy ~64px */
+    min-width: 3.5rem;
+} 
+
+/* Detected Type: Średni priorytet, ale szersza baza niż Sets */
+#existing_type_container,
+#type_select_container {
+    flex: 1.5 1 10rem; /* Rośnij chętniej niż inne, baza 10rem */
+    min-width: 10rem;  /* Gwarantowane miejsce na "Weight & Reps" */
+}
+
+/* --- STYLE INPUTÓW --- */
 
 .form-group label {
     margin-bottom: 0.5rem;
     color: var(--text-gray);
     font-size: 0.9rem;
     white-space: nowrap;
-    /* Żeby etykieta się nie łamała */
 }
 
 .form-group input,
 .form-group select {
     padding: 0.8rem;
-    height: 45px;
-    /* Sztywna wysokość dla inputów */
+    height: 2.8rem; /* 45px -> 2.8rem */
     background: var(--input-bg);
-    border: 1px solid transparent;
+    border: 0.0625rem solid transparent;
     color: white;
     border-radius: 0.5rem;
     box-sizing: border-box;
-    /* Ważne dla paddingu */
     width: 100%;
+    font-family: inherit;
+    font-size: 1rem; /* Ważne dla mobile, żeby nie zoomowało */
 }
 
-/* POPRAWIONY STYL BADGE'A */
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: rgba(255,255,255,0.08);
+}
+
+/* Przycisk Add */
+.add-exercise-form .btn-primary {
+    flex: 0 0 auto;
+    height: 2.8rem; /* Dopasowane do inputów */
+    padding: 0 2rem;
+    font-weight: 600;
+    cursor: pointer;
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 0.5rem;
+    transition: transform 0.1s;
+    font-size: 1rem;
+}
+.add-exercise-form .btn-primary:hover {
+    transform: scale(1.05);
+}
+
+/* --- BADGE (Detected Type) --- */
 .detected-type-badge {
-    height: 45px;
-    /* Ta sama wysokość co input! */
+    height: 2.8rem; /* Dopasowane do inputów */
     padding: 0 1rem;
     background: rgba(56, 224, 123, 0.1);
-    border: 1px solid var(--primary-color);
+    border: 0.0625rem solid var(--primary-color);
     border-radius: 0.5rem;
     color: var(--primary-color);
     font-weight: 500;
+    font-size: 0.95rem;
+    
     display: flex;
     align-items: center;
-    /* Wyśrodkowanie tekstu w pionie */
     gap: 0.5rem;
-    white-space: nowrap;
-    /* Zapobiega łamaniu tekstu */
-    box-sizing: border-box;
-    overflow: hidden;
-    /* Na wypadek długiego tekstu */
+    
     width: 100%;
-    /* Rozciągnij na całą szerokość kontenera */
+    box-sizing: border-box;
+    overflow: hidden; /* Zabezpieczenie przed wylewaniem */
+}
+
+.detected-type-badge span {
+    white-space: nowrap;
+    text-overflow: ellipsis; /* Kropki (...) jak się nie zmieści */
+    overflow: hidden;
+}
+
+.detected-type-badge .material-symbols-outlined {
+    flex-shrink: 0; /* Ikona nigdy się nie zgniata */
+    font-size: 1.25rem;
+}
+
+/* --- UTILITIES & STATES --- */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-gray);
+    background: rgba(255,255,255,0.02);
+    border-radius: 1rem;
+    border: 0.0625rem dashed var(--border-color);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Usuwanie ćwiczenia */
+.btn-icon-delete {
+    background: none;
+    border: none;
+    color: var(--error-text);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon-delete:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+/* --- RESPONSYWNOŚĆ (MOBILE) --- */
+@media (max-width: 48rem) {
+    
+    /* 1. Karta Ćwiczenia na Mobile */
+    .exercise-card {
+        flex-direction: column; /* Układ pionowy */
+        align-items: stretch;
+        position: relative;
+        padding-right: 3.5rem; /* Zrób miejsce na kosz u góry */
+    }
+
+    .btn-icon-delete {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+
+    .exercise-info h3 {
+        padding-right: 1rem; /* Żeby tekst nie wchodził pod kosz */
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .exercise-meta {
+        gap: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    /* 2. Formularz na Mobile */
+    .add-exercise-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+
+    /* Wszystkie pola na 100% szerokości */
+    .form-group, 
+    .form-group.wide, 
+    .form-group.narrow,
+    #type_select_container,
+    #existing_type_container {
+        width: 100%;
+        flex: auto;
+        min-width: 0;
+    }
+
+    /* Przycisk Add na pełną szerokość */
+    .add-exercise-form .btn-primary {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
 }

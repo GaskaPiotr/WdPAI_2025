@@ -1,187 +1,564 @@
- body {
-     background-color: var(--bg-dark, #122017);
-     color: white;
-     font-family: 'Lexend', sans-serif;
-     display: flex;
-     flex-direction: column;
-     height: 100vh;
-     overflow: hidden;
- }
+/* --- GLOBAL LAYOUT --- */
+body {
+    background-color: var(--bg-dark, #122017);
+    color: white;
+    font-family: 'Lexend', sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* Pełna wysokość okna */
+    overflow: hidden;
+    /* Zapobiega scrollowaniu całego body, scrollujemy tylko tabelę */
+    margin: 0;
+}
 
- /* HEADER */
- .session-header {
-     background-color: rgba(18, 32, 23, 0.95);
-     padding: 1rem;
-     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
- }
+/* --- HEADER --- */
+.session-header {
+    background-color: rgba(18, 32, 23, 0.95);
+    padding: 1rem;
+    border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.1);
+    /* 1px */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    /* Header się nie kurczy */
+}
 
- .header-title h1 {
-     margin: 0;
-     font-size: 1.1rem;
- }
+.session-header h1 {
+    margin: 0;
+    font-size: 1.1rem;
+}
 
- .subtitle {
-     color: var(--primary-color, #38e07b);
-     font-size: 0.75rem;
-     text-transform: uppercase;
-     font-weight: 700;
-     display: block;
- }
+.subtitle {
+    color: var(--primary-color, #38e07b);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+}
 
- /* TABELA */
- .table-wrapper {
-     flex: 1;
-     overflow: auto;
-     /* Scroll w obu osiach */
-     padding-bottom: 80px;
- }
+.btn-close {
+    color: white;
+    opacity: 0.5;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
 
- table {
-     width: 100%;
-     border-collapse: separate;
-     /* Wymagane dla sticky */
-     border-spacing: 0;
-     min-width: 800px;
-     /* Szeroka tabela, żeby był scroll */
- }
+.btn-close:hover {
+    opacity: 1;
+}
 
- th {
-     background-color: rgba(255, 255, 255, 0.05);
-     color: rgba(255, 255, 255, 0.5);
-     font-size: 0.75rem;
-     text-transform: uppercase;
-     padding: 1rem;
-     text-align: center;
-     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-     position: sticky;
-     top: 0;
-     z-index: 20;
-     /* Nagłówek nad treścią */
- }
+/* --- TABLE CONTAINER --- */
+.table-wrapper {
+    flex: 1;
+    /* Zajmij resztę miejsca */
+    overflow: auto;
+    /* Scroll w obu osiach */
+    padding-bottom: 5rem;
+    /* 80px -> miejsce na footer */
+    -webkit-overflow-scrolling: touch;
+    /* Płynne przewijanie na iOS */
+}
 
- /* Pierwsza kolumna (Nazwa ćwiczenia) - Sticky Left */
- .col-exercise {
-     position: sticky;
-     left: 0;
-     background-color: #122017;
-     z-index: 30;
-     /* Najwyżej, nad innymi sticky */
-     border-right: 1px solid rgba(255, 255, 255, 0.1);
-     min-width: 160px;
-     max-width: 160px;
-     padding: 1rem;
-     vertical-align: top;
- }
+table {
+    width: 100%;
+    border-collapse: separate;
+    /* Wymagane dla sticky */
+    border-spacing: 0;
+    min-width: 50rem;
+    /* 800px - Szeroka tabela wymusza scroll */
+}
 
- /* Sticky Header dla pierwszej kolumny */
- th.col-exercise {
-     z-index: 40;
-     /* Absolutnie najwyżej */
-     background-color: #122017;
- }
+/* --- TABLE HEADERS --- */
+th {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.1);
 
- td {
-     padding: 0.75rem;
-     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-     vertical-align: top;
-     min-width: 140px;
-     /* Minimalna szerokość kolumny z historią */
- }
+    /* Sticky Header */
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
 
- /* Kolumna "TODAY" */
- .col-today {
-     background-color: rgba(56, 224, 123, 0.02);
-     /* Lekkie podświetlenie */
-     border-left: 1px solid rgba(255, 255, 255, 0.1);
-     min-width: 160px;
- }
+/* --- FIX SZEROKOŚCI KOLUMN HISTORII --- */
+/* To dotyczy wszystkich komórek, które NIE są ćwiczeniem i NIE są dzisiejszym treningiem */
+/* Czyli dotyczy tylko kolumn z datami (Jan 20, itd.) */
+tbody td:not(.col-exercise):not(.col-today),
+thead th:not(.col-exercise):not(.col-today) {
+    min-width: 9rem;
+    /* ok. 144px - żeby wyniki "100kg x 10" miały luz */
+    max-width: 11rem;
+    /* ok. 176px - TU JEST BLOKADA! Dłuższe rzeczy się zawiną */
+    width: 11rem;
+    /* Sugerowana szerokość */
 
- th.col-today {
-     color: var(--primary-color, #38e07b);
-     background-color: rgba(18, 32, 23, 0.95);
- }
+    /* Ważne dla wyrównania notatki */
+    box-sizing: border-box;
+}
 
- /* Inputy w komórkach */
- .set-row {
-     margin-bottom: 6px;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     height: 36px;
-     /* Stała wysokość wiersza serii */
- }
+/* Pierwsza kolumna (Exercise) - Sticky Left */
+.col-exercise {
+    position: sticky;
+    left: 0;
+    background-color: #122017;
+    z-index: 30;
+    /* Nad innymi komórkami */
+    border-right: 0.0625rem solid rgba(255, 255, 255, 0.1);
+    min-width: 10rem;
+    /* 160px */
+    max-width: 10rem;
+    padding: 1rem;
+    vertical-align: top;
+}
 
- /* Inputy do wpisywania (Today) */
- .active-input-group {
-     display: flex;
-     gap: 4px;
-     width: 100%;
- }
+/* Sticky Corner (Lewy górny róg) */
+th.col-exercise {
+    z-index: 40;
+    /* Absolutnie najwyżej */
+    background-color: #122017;
+}
 
- .workout-input {
-     width: 100%;
-     background: rgba(255, 255, 255, 0.1);
-     border: 1px solid transparent;
-     color: white;
-     text-align: center;
-     border-radius: 4px;
-     font-size: 0.9rem;
-     height: 36px;
- }
+/* Zwykłe komórki */
+td {
+    padding: 0.75rem;
+    border-bottom: 0.0625rem solid rgba(255, 255, 255, 0.05);
+    vertical-align: top;
+    min-width: 8.75rem;
+    /* 140px */
+}
 
- .workout-input:focus {
-     border-color: #38e07b;
-     outline: none;
-     background: rgba(255, 255, 255, 0.15);
- }
+/* Kolumna TODAY */
+.col-today {
+    background-color: rgba(56, 224, 123, 0.02);
+    border-left: 0.0625rem solid rgba(255, 255, 255, 0.1);
+    min-width: 10rem;
+    /* 160px */
+}
 
- /* Historia (Read Only) */
- .history-value {
-     color: rgba(255, 255, 255, 0.6);
-     font-size: 0.85rem;
-     background: rgba(255, 255, 255, 0.03);
-     border-radius: 4px;
-     width: 100%;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     height: 36px;
- }
+th.col-today {
+    color: var(--primary-color, #38e07b);
+    background-color: rgba(18, 32, 23, 0.95);
+}
 
- /* Checkbox */
- .check-box {
-     width: 36px;
-     height: 36px;
-     margin-left: 4px;
-     cursor: pointer;
-     accent-color: #38e07b;
-     flex-shrink: 0;
- }
+/* --- EXERCISE DETAILS (Cell 1) --- */
+.exercise-name {
+    color: #38e07b;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
 
- /* Footer */
- .footer {
-     position: fixed;
-     bottom: 0;
-     left: 0;
-     width: 100%;
-     background: rgba(18, 32, 23, 0.95);
-     padding: 1rem;
-     border-top: 1px solid rgba(255, 255, 255, 0.1);
-     display: flex;
-     gap: 1rem;
-     z-index: 50;
- }
+.exercise-type {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+}
 
- .btn-primary {
-     background: #38e07b;
-     color: #122017;
-     border: none;
-     padding: 12px;
-     border-radius: 8px;
-     font-weight: 700;
-     width: 100%;
-     cursor: pointer;
- }
+.exercise-note {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-top: 0.25rem;
+}
+
+/* --- INPUTS & ROWS --- */
+.set-row {
+    margin-bottom: 0.375rem;
+    /* 6px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    /* 36px */
+}
+
+.active-input-group {
+    display: flex;
+    gap: 0.25rem;
+    /* 4px */
+    width: 100%;
+}
+
+.workout-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 0.0625rem solid transparent;
+    color: white;
+    text-align: center;
+    border-radius: 0.25rem;
+    /* 4px */
+    font-size: 0.9rem;
+    height: 2.25rem;
+    /* 36px */
+    /* Mobile optimization */
+    font-family: inherit;
+}
+
+.workout-input:focus {
+    border-color: #38e07b;
+    outline: none;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.history-value {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.25rem;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+}
+
+.check-box {
+    width: 2.25rem;
+    /* 36px */
+    height: 2.25rem;
+    margin-left: 0.25rem;
+    cursor: pointer;
+    accent-color: #38e07b;
+    flex-shrink: 0;
+}
+
+/* --- SESSION NOTES FOOTER --- */
+.row-footer {
+    border-top: 0.125rem solid rgba(255, 255, 255, 0.1);
+}
+
+.cell-sticky-note {
+    background-color: #0e1811;
+    vertical-align: top;
+}
+
+.note-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.cell-note-history {
+    vertical-align: top;
+    padding: 0.75rem;
+}
+
+.note-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    min-height: 5.625rem;
+    /* 90px */
+}
+
+.history-note-text {
+    font-size: 0.75rem;
+    color: #ccc;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border-left: 0.125rem solid #555;
+    margin-bottom: 0.625rem;
+
+    display: block;
+
+    /* --- NAPRAWA SZEROKOŚCI --- */
+    width: 100%;
+    /* Wypełnij całą szerokość kolumny */
+    max-width: none;
+    /* Usuwamy limit, który powodował "szparę" po prawej */
+
+    box-sizing: border-box;
+    text-align: left;
+    line-height: 1.4;
+
+    /* --- ZAWIJANIE TEKSTU --- */
+    /* Tekst nadal będzie się zawijał, ale dopiero na krawędzi kolumny */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.history-note-empty {
+    text-align: center;
+    opacity: 0.1;
+    font-size: 1.5rem;
+    margin-bottom: 0.625rem;
+}
+
+.btn-delete-session {
+    width: 2rem;
+    /* 32px */
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(239, 68, 68, 0.1);
+    border: 0.0625rem solid rgba(239, 68, 68, 0.3);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: #ef4444;
+    transition: all 0.2s;
+}
+
+.btn-delete-session:hover {
+    opacity: 0.8;
+}
+
+.icon-sm {
+    font-size: 1.125rem;
+}
+
+/* 18px */
+
+.cell-note-today {
+    vertical-align: top;
+    padding: 0.5rem;
+}
+
+.note-textarea {
+    width: 100%;
+    height: 6.25rem;
+    /* 100px */
+    background: rgba(0, 0, 0, 0.2);
+    border: 0.0625rem solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    font-family: inherit;
+    font-size: 0.85rem;
+    resize: none;
+    box-sizing: border-box;
+}
+
+/* --- FOOTER --- */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(18, 32, 23, 0.95);
+    padding: 1rem;
+    border-top: 0.0625rem solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 1rem;
+    z-index: 50;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background: #38e07b;
+    color: #122017;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- SUCCESS TOAST (Komunikat sukcesu) --- */
+#success-toast {
+    position: fixed;
+    top: 1.25rem;
+    /* 20px */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #38e07b;
+    color: #122017;
+    padding: 0.75rem 1.5rem;
+    /* 12px 24px */
+    border-radius: 0.5rem;
+    font-weight: 700;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    /* Animacja zdefiniowana poniżej */
+    animation: fadeInOut 4s forwards;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -1.25rem);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    90% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -1.25rem);
+        pointer-events: none;
+    }
+}
+
+
+/* ========================================= */
+/* --- RESPONSYWNOŚĆ (MOBILE FIX) --- */
+/* ========================================= */
+
+@media (max-width: 48rem) {
+    /* Smartfony (<768px) */
+
+    /* 1. KONTENER I TABELA */
+    .table-wrapper {
+        width: 100vw;
+        overflow-x: auto;
+    }
+
+    table {
+        width: max-content;
+        min-width: 100%;
+        table-layout: auto;
+    }
+
+    /* 2. WSZYSTKIE KOMÓRKI (Historia i Today) */
+    th,
+    td {
+        min-width: 5.5rem;
+        max-width: 5.5rem;
+        /* LIMIT SZEROKOŚCI DLA KOLUMN HISTORII */
+        width: 5.5rem;
+        padding: 0.5rem 0.25rem;
+        white-space: normal;
+        vertical-align: top;
+        /* Ważne dla notatek, żeby zaczynały się od góry */
+    }
+
+    /* 3. LEWA KOLUMNA (Exercise + Session Notes) - STICKY FIX */
+    .col-exercise,
+    th.col-exercise,
+    .cell-sticky-note {
+        position: sticky;
+        left: 0;
+        z-index: 30;
+
+        width: 40vw;
+
+        min-width: 8.75rem;
+
+        max-width: 30vw;
+
+        background-color: #122017;
+        border-right: 0.0625rem solid rgba(255, 255, 255, 0.1);
+        /* Tu też warto dać rem (1px) */
+        text-align: left;
+        font-size: 0.85rem;
+    }
+
+    /* Specyficzne ukrywanie detali tylko dla wierszy z ćwiczeniami */
+    td.col-exercise .exercise-type,
+    td.col-exercise .exercise-note {
+        display: none;
+    }
+
+    td.col-exercise .exercise-name {
+        margin-bottom: 0;
+    }
+
+    /* 4. NOTATKI NA MOBILE */
+    .history-note-text {
+        font-size: 0.7rem;
+        /* Mniejsza czcionka */
+        padding: 0.25rem;
+        /* Wymuszamy, by nie wyszło poza 5.5rem */
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* 5. INPUTY */
+    .set-row {
+        height: auto;
+        min-height: 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem 0;
+    }
+
+    .active-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+        align-items: center;
+    }
+
+    .workout-input {
+        width: 100% !important;
+        max-width: 4.5rem;
+        height: 2rem;
+        font-size: 0.9rem;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* 6. KOLUMNA TODAY - Fix */
+    .col-today {
+        /* Musi być szersza niż historia, żeby inputy się mieściły */
+        min-width: 4.5rem;
+        max-width: 8rem;
+        /* Resetujemy max-width ustawione w pkt 2 */
+        width: auto;
+
+        background-color: rgba(56, 224, 123, 0.05);
+        padding: 0.5rem 0.1rem;
+    }
+
+    /* Naprawa stopki z notatką użytkownika (Today) */
+    .cell-note-today {
+        min-width: 6rem;
+        max-width: 6.5rem;
+        /* Trochę więcej miejsca na pisanie */
+    }
+
+    .history-value {
+        width: 100%;
+        text-align: center;
+        font-size: 0.8rem;
+    }
+
+    .history-note-text {
+        font-size: 0.7rem;
+        padding: 0.25rem;
+
+        /* Na mobile resetujemy limit, bo tam rządzi szerokość kolumny (5.5rem) */
+        width: 100%;
+        max-width: 100%;
+    }
+
+    tbody td:not(.col-exercise):not(.col-today),
+    thead th:not(.col-exercise):not(.col-today) {
+        min-width: 7rem;
+        max-width: 8rem;
+        width: 8rem;
+
+        box-sizing: border-box;
+    }
+}

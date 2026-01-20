@@ -104,9 +104,9 @@ class TrainerController extends AppController {
 
         // 5. Renderujemy widok
         // Klucz 'trainee' musi odpowiadać temu, co używasz w HTML ($trainee['name'])
-        return $this->render('trainer_trainee_dashboard', [
-            'trainee' => $traineeData,
-            'plans' => $plans
+        return $this->render('dashboard_trainee', [
+            'plans' => $plans,
+            'trainee' => $traineeData
         ]);
     }
 }
