@@ -89,6 +89,22 @@
             <?php else: ?>
                 <h1 class="page-title">My Workouts</h1>
             <?php endif; ?>
+            <div class="filters-bar">
+                <div class="search-wrapper">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="text" id="searchInput" placeholder="Search workouts...">
+                </div>
+                <?php if (!$isTrainerView): ?> 
+                    <div class="select-wrapper">
+                        <select id="filterSelect" class="filter-select">
+                            <option value="all">All Trainings</option>
+                            <option value="trainer">Only Trainer Assigned</option>
+                            <option value="self">Only Self-made</option>
+                        </select>
+                        <span class="material-symbols-outlined select-arrow">arrow_drop_down</span>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
 
         <div class="workout-list">
@@ -109,7 +125,9 @@
 
             <?php foreach ($plans as $plan): ?>
 
-            <div class="workout-wrapper">
+            <div class="workout-wrapper"
+                data-name="<?= strtolower(htmlspecialchars($plan['name'])); ?>" 
+                data-source="<?= $plan['trainer_id'] ? 'trainer' : 'self'; ?>">
 
                 <a href="/plan?id=<?= $plan['id']; ?>" class="workout-card">
                     <div class="icon-box">

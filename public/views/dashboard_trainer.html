@@ -10,6 +10,8 @@
 
     <link rel="stylesheet" href="public/styles/base.css">
     <link rel="stylesheet" href="public/styles/trainer_dashboard.css">
+
+    <script src="public/scripts/trainer.js" defer></script>
 </head>
 
 <body>
@@ -35,7 +37,7 @@
             <div class="filters-bar">
                 <div class="search-wrapper">
                     <span class="material-symbols-outlined search-icon">search</span>
-                    <input type="text" placeholder="Search trainees...">
+                    <input type="text" id="traineeSearchInput" placeholder="Search trainees...">
                 </div>
             </div>
         </div>
@@ -73,7 +75,8 @@
                         <?php else: ?>
 
                         <?php foreach ($trainees as $trainee): ?>
-                        <tr>
+                        <tr class="trainee-row" 
+                            data-search="<?= strtolower(htmlspecialchars($trainee['name'] . ' ' . $trainee['surname'] . ' ' . $trainee['email'])); ?>">
                             <td>
                                 <div class="user-cell">
                                     <div class="user-avatar-small">
@@ -101,6 +104,12 @@
                             </td>
                         </tr>
                         <?php endforeach; ?>
+
+                        <tr id="noResultsRow" style="display: none;">
+                            <td colspan="4" class="text-center p-3" style="color: var(--text-gray);">
+                                No trainees found matching your search.
+                            </td> 
+                        </tr>
 
                         <?php endif; ?>
                     </tbody>

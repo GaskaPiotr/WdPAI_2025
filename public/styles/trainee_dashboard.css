@@ -262,6 +262,85 @@
 
 .empty-state { text-align: center; padding: 4rem 0; color: var(--text-gray); }
 
+
+/* --- FILTERS BAR --- */
+.filters-bar {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap; /* Żeby spadało na mobile */
+}
+
+.search-wrapper {
+    flex: 1; /* Zajmuje dostępne miejsce */
+    background-color: var(--card-dark);
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    border-radius: 0.5rem;
+    height: 3.125rem; /* 50px */
+    border: 0.0625rem solid transparent;
+    transition: border-color 0.2s;
+}
+
+.search-wrapper:focus-within {
+    border-color: var(--primary-color);
+}
+
+.search-icon { color: var(--text-gray); font-size: 1.25rem; }
+
+.search-wrapper input {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    height: 100%;
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    font-family: inherit;
+}
+.search-wrapper input:focus { outline: none; }
+
+/* Stylowanie Selecta (Dropdown) */
+.select-wrapper {
+    position: relative;
+    background-color: var(--card-dark);
+    border-radius: 0.5rem;
+    height: 3.125rem;
+    min-width: 12rem;
+    display: flex;
+    align-items: center;
+}
+
+.filter-select {
+    appearance: none; /* Usuwa domyślny styl systemowy */
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    height: 100%;
+    padding: 0 2.5rem 0 1rem; /* Miejsce na strzałkę */
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.filter-select:focus { outline: none; }
+.filter-select option {
+    background-color: #1e1e1e; /* Tło opcji po rozwinięciu */
+    color: white;
+    padding: 10px;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 0.8rem;
+    color: var(--primary-color);
+    pointer-events: none; /* Kliknięcie przelatuje do selecta */
+}
+
 /* ========================================= */
 /* --- RESPONSYWNOŚĆ (MOBILE) --- */
 /* ========================================= */
@@ -271,12 +350,30 @@
     .logo-section span { font-size: 1.1rem; }
     .user-section { gap: 1rem; }
     
-    /* Dropdown powiadomień na całą szerokość ekranu */
     .notification-dropdown {
-        right: -3rem; /* Przesunięcie żeby wycentrować względem ekranu */
-        width: 90vw;
-        max-width: 20rem;
+        /* 1. Odrywamy od ikonki, przyklejamy do okna */
+        position: fixed;
+        
+        /* 2. Ustawiamy pod navbarem */
+        /* Zmień tę wartość jeśli Twój navbar jest wyższy/niższy */
+        top: 4.5rem; 
+        
+        /* 3. Centrujemy na ekranie */
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto; /* Resetujemy ustawienie desktopowe */
+        
+        /* 4. Szerokość responsywna */
+        width: 90vw; /* 90% szerokości ekranu */
+        max-width: 25rem; /* Żeby na tabletach nie było gigantyczne */
+        
+        /* 5. Dodatkowy cień dla lepszej widoczności nad treścią */
+        box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        border: 1px solid var(--border-color);
     }
+
+    /* Opcjonalnie: Dodajemy małą strzałkę wskazującą górę (żeby wyglądało ładnie) */
+
 
     /* Układ kart */
     .workout-wrapper {
@@ -300,4 +397,17 @@
 
     /* Ukryj datę na karcie jeśli jest za ciasno, lub zostaw */
     .card-date { display: none; } 
+
+    .filters-bar {
+        flex-direction: column; /* Jeden pod drugim */
+        gap: 0.75rem;
+    }
+    
+    .search-wrapper, .select-wrapper {
+        width: 100%; /* Pełna szerokość */
+    }
+
+    .search-wrapper {
+        min-height: 3rem;
+    }
 }
