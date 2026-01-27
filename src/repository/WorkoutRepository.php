@@ -283,4 +283,18 @@ class WorkoutRepository extends Repository
         $stmt->bindParam(':id', $sessionId, PDO::PARAM_INT);
         $stmt->execute();
     }
+    public function isTraineeAccepted(int $trainerId, int $traineeId): bool
+    {
+        $stmt = $this->database->connect()->prepare("
+            SELECT 1 FROM trainer_trainees 
+            WHERE trainer_id = :trainer_id 
+              AND trainee_id = :trainee_id 
+              AND status = 'accepted'
+        ");
+        $stmt->bindParam(':trainer_id', $trainerId, PDO::PARAM_INT);
+        $stmt->bindParam(':trainee_id', $traineeId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return (bool) $stmt->fetch();
+    }
 }

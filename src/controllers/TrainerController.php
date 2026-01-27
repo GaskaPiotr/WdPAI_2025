@@ -1,6 +1,81 @@
 <?php
 
 require_once 'AppController.php';
+require_once __DIR__.'/../services/TrainerService.php';
+
+class TrainerController extends AppController {
+
+    private $trainerService;
+    private static $instance = null;
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    public function __construct()
+    {
+        // Inicjalizujemy TYLKO serwis. Repozytoria są ukryte wewnątrz serwisu.
+        $this->trainerService = new TrainerService();
+    }
+
+    public function addTrainee()
+    {
+        // 1. GET: Wyświetl formularz
+        if (!$this->isPost()) {
+            return $this->render('add_trainee');
+        }
+
+        // 2. POST: Obsłuż logikę przez Serwis
+        $email = $_POST['email'];
+        $trainerId = $_SESSION['user_id'];
+
+        try {
+            // Delegujemy brudną robotę do serwisu
+            $this->trainerService->addTrainee($trainerId, $email);
+
+            // Sukces - przekierowanie
+            $url = "http://$_SERVER[HTTP_HOST]";
+            header("Location: {$url}/dashboard");
+
+        } catch (Exception $e) {
+            // Błąd - wyświetl formularz z komunikatem błędu z serwisu
+            return $this->render('add_trainee', ['messages' => [$e->getMessage()]]);
+        }
+    }
+
+    public function showTraineeDashboard()
+    {
+        $traineeId = $_GET['id'] ?? null;
+        $trainerId = $_SESSION['user_id'];
+
+        if (!$traineeId) {
+            $url = "http://$_SERVER[HTTP_HOST]";
+            header("Location: {$url}/dashboard");
+            return;
+        }
+
+        try {
+            // Serwis zwraca nam gotową paczkę danych albo rzuca błędem
+            $data = $this->trainerService->getTraineeDetails($trainerId, (int)$traineeId);
+
+            // Renderujemy widok używając danych z serwisu
+            return $this->render('dashboard_trainee', [
+                'plans' => $data['plans'],
+                'trainee' => $data['trainee']
+            ]);
+
+        } catch (Exception $e) {
+            // W przypadku błędu (np. brak dostępu)
+            die($e->getMessage()); 
+            // lub ładniej: return $this->render('error', ['message' => $e->getMessage()]);
+        }
+    }
+}
+/*
+require_once 'AppController.php';
 require_once __DIR__.'/../repository/UserRepository.php';
 require_once __DIR__.'/../repository/WorkoutRepository.php';
 
@@ -110,3 +185,4 @@ class TrainerController extends AppController {
         ]);
     }
 }
+*/

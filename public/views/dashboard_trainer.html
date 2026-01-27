@@ -74,34 +74,50 @@
                         </tr>
                         <?php else: ?>
 
-                        <?php foreach ($trainees as $trainee): ?>
+                        <?php foreach ($trainees as $traineeDto): ?>
                         <tr class="trainee-row" 
                             data-search="<?= strtolower(htmlspecialchars($trainee['name'] . ' ' . $trainee['surname'] . ' ' . $trainee['email'])); ?>">
                             <td>
                                 <div class="user-cell">
                                     <div class="user-avatar-small">
-                                        <?= strtoupper(substr($trainee['name'], 0, 1) . substr($trainee['surname'], 0, 1)); ?>
+                                        <?= strtoupper(substr($traineeDto->firstName, 0, 1) . substr($traineeDto->lastName, 0, 1)); ?>
                                     </div>
                                     <span class="user-name">
-                                        <?= htmlspecialchars($trainee['name'] . " " . $trainee['surname']); ?>
+                                        <?= htmlspecialchars($traineeDto->firstName . " " . $traineeDto->lastName); ?>
                                     </span>
                                 </div>
                             </td>
                             <td>
                                 <span class="user-email">
-                                    <?= htmlspecialchars($trainee['email']); ?>
+                                    <?= htmlspecialchars($traineeDto->email); ?>
                                 </span>
                             </td>
                             <td>
-                                <?php if ($trainee['status'] === 'accepted'): ?>
+                                <?php if ($traineeDto->status === 'accepted'): ?>
                                     <span class="badge active">Active</span>
                                 <?php else: ?>
                                     <span class="badge pending">Pending</span>
                                 <?php endif; ?>
                             </td>
                             <td class="text-right">
-                                <a href="/trainee-dashboard?id=<?= $trainee['id']; ?>" class="btn-text">Manage Plans</a>
+                                <?php if ($traineeDto->status === 'accepted'): ?>
+                                    
+                                    <a href="/trainee-dashboard?id=<?= $traineeDto->id; ?>" class="btn-text">
+                                        Manage Plans
+                                    </a>
+
+                                <?php else: ?>
+                                    
+                                    <span style="color: var(--text-gray); font-size: 0.9rem; margin-right: 1rem;">
+                                        Waiting for accept...
+                                    </span>
+
+                                <?php endif; ?>
                             </td>
+                            <!--
+                            <td class="text-right">
+                                <a href="/trainee-dashboard?id=<?= $traineeDto->id; ?>" class="btn-text">Manage Plans</a>
+                            </td>-->
                         </tr>
                         <?php endforeach; ?>
 

@@ -1,6 +1,8 @@
 <?php
 
 require_once 'Repository.php';
+require_once __DIR__.'/../models/User.php';
+require_once __DIR__.'/../models/dto/UserDto.php';
 
 class UserRepository extends Repository
 {
@@ -59,9 +61,21 @@ class UserRepository extends Repository
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
 
-        $users = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        
+        if ($user == false) {
+            return null;
+        }
 
-       return $users;
+        return new User(
+            $user['email'],
+            $user['password'],
+            $user['name'],
+            $user['surname'],
+            $user['role_id'],
+            $user['id']
+        );
     }
     
     public function getUserById(int $id) {
@@ -73,7 +87,18 @@ class UserRepository extends Repository
 
         // fetch zwraca tablicę LUB false. Jeśli zwróci false, kontroler to wyłapie.
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if ($user == false) {
+            return null;
+        }
 
-        return $user;
+        return new User(
+            $user['email'],
+            $user['password'],
+            $user['name'],
+            $user['surname'],
+            $user['role_id'],
+            $user['id']
+        );
     }
 }

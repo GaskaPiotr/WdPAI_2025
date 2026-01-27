@@ -10,6 +10,10 @@ require_once 'src/controllers/PlanController.php';
 class Routing {
 
     public static $routes = [
+        '' => [
+            'controller' => 'DashboardController',
+            'action' => 'index' 
+        ],
         'login' => [
             'controller' => 'SecurityController',
             'action' => 'login'
@@ -84,6 +88,7 @@ class Routing {
             return;
         }
         switch ($path) {
+            case '':
             case 'delete-session':
             case 'save-workout':
             case 'start-workout':
@@ -100,12 +105,20 @@ class Routing {
             case 'trainee-dashboard':
             case 'login':
             case 'register':
-                $controller = Routing::$routes[$path]['controller'];
-                $action = Routing::$routes[$path]['action'];
-
-                $controllerObj = $controller::getInstance();
-                $controllerObj->$action();
+                $routeKey = $path; 
+                
+                if (array_key_exists($routeKey, Routing::$routes)) {
+                    $controller = Routing::$routes[$routeKey]['controller'];
+                    $action = Routing::$routes[$routeKey]['action'];
+    
+                    $controllerObj = $controller::getInstance();
+                    $controllerObj->$action();
+                } else {
+                    // Zabezpieczenie, gdyby case istniał, ale nie było wpisu w tablicy
+                    include 'public/views/404.html';
+                }
                 break;
+
             default:
                 include 'public/views/404.html';
                 break;

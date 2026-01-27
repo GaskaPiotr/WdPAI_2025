@@ -81,10 +81,10 @@
             <?php if ($isTrainerView): ?>
                 <p style="color: var(--text-gray); margin-bottom: 0.5rem;">Viewing profile of:</p>
                 <h1 class="page-title" style="color: var(--primary-color);">
-                    <?= htmlspecialchars($trainee['name'] . " " . $trainee['surname']); ?>
+                    <?= htmlspecialchars($trainee->firstName . " " . $trainee->lastName); ?>
                 </h1>
                 <p style="color: var(--text-gray); font-size: 0.9rem;">
-                    Email: <?= htmlspecialchars($trainee['email']); ?>
+                    Email: <?= htmlspecialchars($trainee->email); ?>
                 </p>
             <?php else: ?>
                 <h1 class="page-title">My Workouts</h1>

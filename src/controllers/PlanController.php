@@ -1,5 +1,190 @@
 <?php
 
+
+require_once 'AppController.php';
+require_once __DIR__.'/../services/PlanService.php';
+
+class PlanController extends AppController {
+
+    private $planService;
+    private static $instance = null;
+
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    public function __construct()
+    {
+        $this->planService = new PlanService();
+    }
+
+
+    public function index() {
+        $planId = $_GET['id'] ?? null;
+        if (!$planId) {
+            $this->redirect('/dashboard');
+            return;
+        }
+
+        try {
+            $data = $this->planService->getPlanDetails((int)$planId);
+            return $this->render('plan_details', $data);
+        } catch (Exception $e) {
+             // Obsługa błędu, np. plan nie istnieje
+             $this->redirect('/dashboard');
+        }
+    }
+
+    public function addExercise() {
+        if (!$this->isPost()) return;
+
+        $planId = $_POST['plan_id'];
+        $exerciseName = trim($_POST['exercise_name']);
+        $exerciseType = $_POST['exercise_type'];
+        $sets = (int)$_POST['sets'];
+        $note = $_POST['note'];
+
+        try {
+            $this->planService->addExerciseToPlan((int)$planId, $exerciseName, $exerciseType, $sets, $note);
+        } catch (Exception $e) {
+            // Można dodać przekazanie błędu do widoku
+        }
+        
+        $this->redirect("/plan?id={$planId}");
+    }
+
+    public function deleteExercise() {
+        if (!$this->isPost()) return;
+
+        $relationId = $_POST['relation_id'];
+        $planId = $_POST['plan_id'];
+
+        $this->planService->deleteExerciseFromPlan((int)$relationId);
+
+        $this->redirect("/plan?id={$planId}");
+    }
+
+    public function addPlan()
+    {
+        // === GET: Wyświetlanie formularza ===
+        if (!$this->isPost()) {
+            $targetTraineeId = $_GET['traineeId'] ?? null;
+            $data = $this->planService->getAddPlanData($targetTraineeId ? (int)$targetTraineeId : null);
+            
+            return $this->render('add_plan', [
+                'targetTraineeId' => $targetTraineeId,
+                'trainee' => $data['trainee']
+            ]);
+        }
+
+        // === POST: Zapisywanie ===
+        $planName = $_POST['plan_name'];
+        $targetTraineeId = $_POST['target_trainee_id'] ?? null; 
+
+        try {
+            $this->planService->createPlan($planName, (int)$_SESSION['user_id'], $targetTraineeId ? (int)$targetTraineeId : null);
+
+            if ($targetTraineeId) {
+                $this->redirect("/trainee-dashboard?id={$targetTraineeId}");
+            } else {
+                $this->redirect("/dashboard");
+            }
+
+        } catch (Exception $e) {
+             // W razie błędu ponownie pobieramy dane
+             $data = $this->planService->getAddPlanData($targetTraineeId ? (int)$targetTraineeId : null);
+             return $this->render('add_plan', [
+                'messages' => [$e->getMessage()], 
+                'targetTraineeId' => $targetTraineeId,
+                'trainee' => $data['trainee']
+            ]);
+        }
+    }
+
+    public function delete()
+    {
+        if (!$this->isPost()) {
+            $this->redirect("/dashboard");
+            return;
+        }
+
+        $planId = $_POST['plan_id'];
+        $currentUserId = $_SESSION['user_id'];
+
+        try {
+            $traineeId = $this->planService->deletePlan((int)$planId, $currentUserId);
+
+             if ($traineeId !== null) {
+                $this->redirect("/trainee-dashboard?id={$traineeId}");
+            } else {
+                $this->redirect("/dashboard");
+            }
+        } catch (Exception $e) {
+            die($e->getMessage()); // Lub render error page
+        }
+    }
+
+   public function startWorkout()
+    {
+        $planId = $_GET['id'] ?? null;
+        if (!$planId) { $this->redirect("/dashboard"); return; }
+
+        try {
+            $data = $this->planService->getWorkoutSessionData((int)$planId);
+            return $this->render('workout_session', $data);
+        } catch (Exception $e) {
+             $this->redirect("/dashboard");
+        }
+    }
+
+    public function saveWorkout()
+    {
+        if (!$this->isPost()) {
+            $this->redirect("/dashboard");
+            return;
+        }
+
+        $planId = $_POST['plan_id'];
+        $userNote = $_POST['user_note'] ?? '';
+        $results = $_POST['results'] ?? [];
+
+        try {
+            $this->planService->saveWorkoutSession((int)$planId, $userNote, $results);
+            $this->redirect("/start-workout?id={$planId}&saved=1");
+        } catch (Exception $e) {
+            die("Error saving workout: " . $e->getMessage());
+        }
+    }
+
+    public function deleteSession()
+    {
+        if (!$this->isPost()) {
+            $this->redirect("/dashboard");
+            return;
+        }
+
+        $sessionId = $_POST['session_id'];
+        $planId = $_POST['plan_id'];
+
+        if ($sessionId) {
+            $this->planService->deleteSession((int)$sessionId);
+        }
+
+        $this->redirect("/start-workout?id={$planId}");
+    }
+    
+    // Pomocnicza metoda do przekierowań
+    private function redirect($path) {
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}{$path}");
+    }
+}
+
+/*
+
 require_once 'AppController.php';
 require_once __DIR__.'/../repository/WorkoutRepository.php';
 require_once __DIR__.'/../repository/UserRepository.php';
@@ -301,3 +486,4 @@ class PlanController extends AppController {
         header("Location: {$url}/start-workout?id={$planId}");
     }
 }
+    */
