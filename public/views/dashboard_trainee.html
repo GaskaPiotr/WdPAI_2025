@@ -180,7 +180,7 @@
     <?php 
         $addPlanLink = "/add-plan";
         if ($isTrainerView) {
-            $addPlanLink .= "?traineeId=" . $trainee['id'];
+            $addPlanLink .= "?traineeId=" . $trainee->id;
         }
     ?>
     <a href="<?= $addPlanLink; ?>" class="fab-btn">

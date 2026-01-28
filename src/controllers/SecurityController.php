@@ -33,19 +33,25 @@ class SecurityController extends AppController {
 
         try {
             // Serwis zwraca dane usera LUB rzuca wyjątek
-            $user = $this->authService->login($email, $password);
+            $userDto = $this->authService->login($email, $password);
 
             // Sukces -> Ustawiamy sesję (to zadanie kontrolera/warstwy HTTP)
-            $_SESSION['user_id'] = $user->getId();
-            $_SESSION['user_email'] = $user->getEmail(); 
-            $_SESSION['role_id'] = $user->getRoleId();
+            $_SESSION['user_id'] = $userDto->id;
+            $_SESSION['user_email'] = $userDto->email; 
+            $_SESSION['role_id'] = $userDto->roleId;
 
             // Przekierowanie
             $this->redirect('/dashboard');
 
         } catch (Exception $e) {
+
+            if (strpos($e->getMessage(), 'locked') !== false || strpos($e->getMessage(), 'Try again') !== false) {
+                http_response_code(429); // 429 Too Many Requests
+            } else {
+                http_response_code(401); // 401 Unauthorized (złe hasło/email)
+            }
             // Błąd -> Wyświetlamy formularz z komunikatem
-            return $this->render('login', ['message' => $e->getMessage()]);
+            return $this->render('login', ['messages' => [$e->getMessage()]]);
         }
     }
 
@@ -70,13 +76,14 @@ class SecurityController extends AppController {
 
         try {
             $this->authService->register($email, $password, $confirmPassword, $name, $surname, $roleName);
-            
+            http_response_code(201); 
             // Sukces -> Przekieruj na login lub wyświetl login z komunikatem
             return $this->render("login", ["messages" => ["Account created! Please log in."]]);
 
         } catch (Exception $e) {
+            http_response_code(400);
             // Błąd -> Wyświetl formularz rejestracji z błędem
-            return $this->render('register', ['message' => $e->getMessage()]);
+            return $this->render('register', ['messages' => [$e->getMessage()]]);
         }
     }
 

@@ -29,12 +29,23 @@ class PlanController extends AppController {
             return;
         }
 
+        $currentUserId = $_SESSION['user_id'];
+
         try {
-            $data = $this->planService->getPlanDetails((int)$planId);
+            $data = $this->planService->getPlanDetails((int)$planId, $currentUserId);
             return $this->render('plan_details', $data);
         } catch (Exception $e) {
              // Obsługa błędu, np. plan nie istnieje
-             $this->redirect('/dashboard');
+            $code = 404;
+            if (strpos($e->getMessage(), 'Access Denied') !== false) {
+                $code = 403;
+            }
+
+            http_response_code($code);
+            return $this->render('error', [
+                'code' => $code,
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
@@ -50,7 +61,11 @@ class PlanController extends AppController {
         try {
             $this->planService->addExerciseToPlan((int)$planId, $exerciseName, $exerciseType, $sets, $note);
         } catch (Exception $e) {
-            // Można dodać przekazanie błędu do widoku
+            http_response_code(400);
+            return $this->render('error', [
+                'code' => 400,
+                'message' => 'Failed to add exercise: ' . $e->getMessage()
+            ]);
         }
         
         $this->redirect("/plan?id={$planId}");
@@ -61,10 +76,14 @@ class PlanController extends AppController {
 
         $relationId = $_POST['relation_id'];
         $planId = $_POST['plan_id'];
+        try {
+            $this->planService->deleteExerciseFromPlan((int)$relationId);
 
-        $this->planService->deleteExerciseFromPlan((int)$relationId);
-
-        $this->redirect("/plan?id={$planId}");
+            $this->redirect("/plan?id={$planId}");
+        } catch (Exception $e) {
+            http_response_code(500);
+            return $this->render('error', ['code' => 500, 'message' => $e->getMessage()]);
+        }
     }
 
     public function addPlan()
@@ -95,8 +114,11 @@ class PlanController extends AppController {
 
         } catch (Exception $e) {
              // W razie błędu ponownie pobieramy dane
-             $data = $this->planService->getAddPlanData($targetTraineeId ? (int)$targetTraineeId : null);
-             return $this->render('add_plan', [
+            http_response_code(400);
+
+            // Wracamy do formularza z komunikatem błędu
+            $data = $this->planService->getAddPlanData($targetTraineeId ? (int)$targetTraineeId : null);
+            return $this->render('add_plan', [
                 'messages' => [$e->getMessage()], 
                 'targetTraineeId' => $targetTraineeId,
                 'trainee' => $data['trainee']
@@ -123,7 +145,11 @@ class PlanController extends AppController {
                 $this->redirect("/dashboard");
             }
         } catch (Exception $e) {
-            die($e->getMessage()); // Lub render error page
+            http_response_code(400);
+            return $this->render('error', [
+                'code' => 400,
+                'message' => 'Could not delete plan: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -136,7 +162,8 @@ class PlanController extends AppController {
             $data = $this->planService->getWorkoutSessionData((int)$planId);
             return $this->render('workout_session', $data);
         } catch (Exception $e) {
-             $this->redirect("/dashboard");
+            http_response_code(404);
+            return $this->render('error', ['code' => 404, 'message' => $e->getMessage()]);
         }
     }
 
@@ -155,7 +182,11 @@ class PlanController extends AppController {
             $this->planService->saveWorkoutSession((int)$planId, $userNote, $results);
             $this->redirect("/start-workout?id={$planId}&saved=1");
         } catch (Exception $e) {
-            die("Error saving workout: " . $e->getMessage());
+            http_response_code(500);
+            return $this->render('error', [
+                'code' => 500, 
+                'message' => "Error saving workout: " . $e->getMessage()
+            ]);
         }
     }
 
@@ -168,18 +199,23 @@ class PlanController extends AppController {
 
         $sessionId = $_POST['session_id'];
         $planId = $_POST['plan_id'];
-
-        if ($sessionId) {
-            $this->planService->deleteSession((int)$sessionId);
+        
+        try {
+            if ($sessionId) {
+                $this->planService->deleteSession((int)$sessionId);
+            }
+            $this->redirect("/start-workout?id={$planId}");
+        } catch (Exception $e) {
+            http_response_code(500);
+            return $this->render('error', ['code' => 500, 'message' => $e->getMessage()]);
         }
-
-        $this->redirect("/start-workout?id={$planId}");
     }
     
     // Pomocnicza metoda do przekierowań
     private function redirect($path) {
         $url = "http://$_SERVER[HTTP_HOST]";
         header("Location: {$url}{$path}");
+        exit;
     }
 }
 

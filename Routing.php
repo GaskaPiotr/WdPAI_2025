@@ -57,7 +57,7 @@ class Routing {
         ],
         'plan' => [
             'controller' => 'PlanController',
-            'action' => 'index' // To wyświetla szczegóły
+            'action' => 'index'
         ],
         'add-exercise' => [
             'controller' => 'PlanController',

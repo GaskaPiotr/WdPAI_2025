@@ -12,19 +12,31 @@ class PlanService {
 
     public function __construct() {
         $this->workoutRepository = new WorkoutRepository();
-        $this->userRepository = new UserRepository();
+        $this->userRepository = UserRepository::getInstance();
         $this->exerciseRepository = new ExerciseRepository();
     }
 
-    public function getPlanDetails(int $planId): array {
+    public function getPlanDetails(int $planId, int $currentUserId): array {
         $plan = $this->workoutRepository->getPlanById($planId);
         
         if (!$plan) {
              throw new Exception("Plan not found");
         }
 
-        // Security check (opcjonalnie, w zależności od wymagań)
-        // ...
+        $isOwner = ($plan['user_id'] === $currentUserId);
+        
+        // Jeśli nie jest właścicielem, sprawdzamy, czy jest TRENEREM tego użytkownika
+        $isTrainer = false;
+        if (!$isOwner) {
+            // Sprawdzamy w repozytorium czy istnieje relacja trener-podopieczny
+            // currentUserId to Trener (potencjalnie), plan['user_id'] to Podopieczny
+            $isTrainer = $this->workoutRepository->isTraineeAccepted($currentUserId, $plan['user_id']);
+        }
+
+        // Jeśli ani właściciel, ani trener -> WARA!
+        if (!$isOwner && !$isTrainer) {
+            throw new Exception("Access Denied. You do not have permission to view this plan.");
+        }
 
         $exercises = $this->exerciseRepository->getExercisesByPlanId($planId);
         $allExercises = $this->exerciseRepository->getAllExercises();
@@ -37,6 +49,15 @@ class PlanService {
     }
 
     public function addExerciseToPlan(int $planId, string $exerciseName, string $exerciseType, int $sets, ?string $note): void {
+        if (strlen($exerciseName) > 100) {
+            throw new Exception("Exercise name is too long (max 100 chars).");
+        }
+
+        // Notatka może być dłuższa, ale bez przesady (np. 500 znaków)
+        if (strlen($note) > 500) {
+            throw new Exception("Note is too long (max 500 chars).");
+        }
+
         if (empty($exerciseName)) {
             throw new Exception("Exercise name cannot be empty");
         }
@@ -50,15 +71,35 @@ class PlanService {
     }
 
     public function getAddPlanData(?int $targetTraineeId): array {
-        $traineeData = null;
+        $traineeDto = null;
+
         if ($targetTraineeId) {
-            $traineeData = $this->userRepository->getUserById($targetTraineeId);
+            // To zwraca obiekt Entity (User)
+            $userEntity = $this->userRepository->getUserById($targetTraineeId);
+            
+            if ($userEntity) {
+                // TWORZYMY DTO
+                // Przepisujemy dane z Entity do DTO
+                $traineeDto = new UserDto(
+                    $userEntity->getId(),
+                    $userEntity->getEmail(),
+                    $userEntity->getName(),
+                    $userEntity->getSurname(),
+                    'trainee',
+                    null
+                );
+            }
         }
-        return ['trainee' => $traineeData];
+        
+        return ['trainee' => $traineeDto];
     }
 
     public function createPlan(string $planName, int $creatorId, ?int $targetTraineeId): void {
-         if (empty($planName)) {
+        if (strlen($planName) > 100) {
+            throw new Exception("Plan name is too long (max 100 chars).");
+        }
+
+        if (empty($planName)) {
             throw new Exception("Plan name cannot be empty");
         }
 

@@ -44,7 +44,12 @@ class DashboardController extends AppController {
 
         } catch (Exception $e) {
             // Obsługa błędu krytycznego (np. brak roli w bazie)
-            die($e->getMessage());
+            http_response_code(500); // Internal Server Error
+            
+            return $this->render('error', [
+                'code' => 500,
+                'message' => 'Critical Error: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -57,12 +62,48 @@ class DashboardController extends AppController {
         $requestId = (int)$_POST['request_id'];
         $action = $_POST['action']; 
 
-        // Delegujemy akcję do serwisu
-        $this->dashboardService->processInvitation($requestId, $action);
+        try {
+            // Delegujemy akcję do serwisu
+            $this->dashboardService->processInvitation($requestId, $action);
 
-        // Przekierowanie (Zadanie kontrolera)
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/dashboard");
+            // Przekierowanie (Zadanie kontrolera)
+            $url = "http://$_SERVER[HTTP_HOST]";
+            header("Location: {$url}/dashboard"); 
+        } catch (Exception $e) {
+            http_response_code(400); // Bad Request
+            
+            return $this->render('error', [
+                'code' => 400,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    private function validatePassword(string $password): void {
+        // 1. Długość (minimum 8 znaków)
+        if (strlen($password) < 8) {
+            throw new Exception("Password is too short. Minimum 8 characters required.");
+        }
+
+        // 2. Musi zawierać wielką literę
+        if (!preg_match('/[A-Z]/', $password)) {
+            throw new Exception("Password must contain at least one uppercase letter.");
+        }
+
+        // 3. Musi zawierać małą literę
+        if (!preg_match('/[a-z]/', $password)) {
+            throw new Exception("Password must contain at least one lowercase letter.");
+        }
+
+        // 4. Musi zawierać cyfrę
+        if (!preg_match('/[0-9]/', $password)) {
+            throw new Exception("Password must contain at least one number.");
+        }
+
+        // 5. Musi zawierać znak specjalny
+        if (!preg_match('/[\W]/', $password)) {
+            throw new Exception("Password must contain at least one special character (!@#$%^&*).");
+        }
     }
 }
 /*

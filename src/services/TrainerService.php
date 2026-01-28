@@ -9,12 +9,15 @@ class TrainerService {
     private $workoutRepository;
 
     public function __construct() {
-        $this->userRepository = new UserRepository();
+        $this->userRepository = UserRepository::getInstance();
         $this->workoutRepository = new WorkoutRepository();
     }
 
     // Logika dodawania podopiecznego
     public function addTrainee(int $trainerId, string $email): void {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Invalid email format provided');
+        }
         
         if (empty($email)) {
             throw new Exception('Please provide an email address');
@@ -64,7 +67,8 @@ class TrainerService {
             $userEntity->getEmail(),
             $userEntity->getName(),
             $userEntity->getSurname(),
-            'trainee'
+            $userEntity->getRoleName(),
+            $userEntity->getRoleId()
         );
         
         // 3. Pobieramy plany
@@ -88,8 +92,9 @@ class TrainerService {
                 $row['email'],
                 $row['name'],
                 $row['surname'],
-                'trainee',
-                $row['status'] // Tu jest ten status, o który pytałeś
+                $row['role_name'],
+                $row['role_id'],
+                $row['status']
             );
         }
 

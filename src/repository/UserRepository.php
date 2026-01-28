@@ -4,8 +4,26 @@ require_once 'Repository.php';
 require_once __DIR__.'/../models/User.php';
 require_once __DIR__.'/../models/dto/UserDto.php';
 
-class UserRepository extends Repository
-{
+class UserRepository extends Repository {
+
+    // 1. Statyczna właściwość na instancję
+    private static $instance = null;
+
+    // 2. Metoda publiczna do pobierania instancji
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    // 3. PRYWATNY konstruktor (blokuje `new UserRepository()`)
+    // Wywołujemy parent::__construct(), aby zainicjować połączenie z bazą z klasy Repository
+    private function __construct() {
+        parent::__construct();
+    }
+
+
     public function getUsers(): ?array
     {
         $stmt = $this->database->connect()->prepare('
@@ -56,7 +74,10 @@ class UserRepository extends Repository
 
     public function getUserByEmail(string $email) {
         $stmt = $this->database->connect()->prepare('
-            SELECT * FROM users WHERE email = :email
+            SELECT u.*, r.name as role_name 
+            FROM users u 
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.email = :email
         ');
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
@@ -74,13 +95,17 @@ class UserRepository extends Repository
             $user['name'],
             $user['surname'],
             $user['role_id'],
+            $user['role_name'],
             $user['id']
         );
     }
     
     public function getUserById(int $id) {
         $stmt = $this->database->connect()->prepare('
-            SELECT * FROM users WHERE id = :id
+            SELECT u.*, r.name as role_name 
+            FROM users u 
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.id = :id
         ');
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -98,7 +123,50 @@ class UserRepository extends Repository
             $user['name'],
             $user['surname'],
             $user['role_id'],
+            $user['role_name'],
             $user['id']
         );
+    }
+
+
+    public function getLoginAttempts(string $ipAddress): array {
+        $stmt = $this->database->connect()->prepare('
+            SELECT * FROM login_attempts WHERE ip_address = :ip
+        ');
+        $stmt->bindParam(':ip', $ipAddress, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        // Zwracamy tablicę lub null
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: []; 
+    }
+
+
+    public function incrementLoginAttempts(string $ipAddress): void {
+        // Sprawdzamy czy IP już istnieje
+        $exists = $this->getLoginAttempts($ipAddress);
+
+        if ($exists) {
+            $stmt = $this->database->connect()->prepare('
+                UPDATE login_attempts 
+                SET attempts = attempts + 1, last_attempt = NOW() 
+                WHERE ip_address = :ip
+            ');
+        } else {
+            $stmt = $this->database->connect()->prepare('
+                INSERT INTO login_attempts (ip_address, attempts, last_attempt) 
+                VALUES (:ip, 1, NOW())
+            ');
+        }
+        $stmt->bindParam(':ip', $ipAddress, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+
+
+    public function clearLoginAttempts(string $ipAddress): void {
+        $stmt = $this->database->connect()->prepare('
+            DELETE FROM login_attempts WHERE ip_address = :ip
+        ');
+        $stmt->bindParam(':ip', $ipAddress, PDO::PARAM_STR);
+        $stmt->execute();
     }
 }

@@ -32,7 +32,7 @@
             
             <p style="color: var(--text-gray);">
                 <?php if(isset($trainee) && $trainee): ?>
-                    Creating routine for <strong style="color: var(--primary-color);"><?= htmlspecialchars($trainee['name'] . ' ' . $trainee['surname']); ?></strong>
+                    Creating routine for <strong style="color: var(--primary-color);"><?= htmlspecialchars($trainee->firstName . ' ' . $trainee->lastName); ?></strong>
                 <?php else: ?>
                     Give your new routine a name.
                 <?php endif; ?>

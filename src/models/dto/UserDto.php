@@ -6,6 +6,7 @@ class UserDto {
     public string $firstName;
     public string $lastName;
     public string $role;
+    public int $roleId;
     public ?string $status;
 
     // Konstruktor
@@ -15,6 +16,7 @@ class UserDto {
         string $firstName, 
         string $lastName, 
         string $role,
+        int $roleId,
         string $status = null
     ) {
         $this->id = $id;
@@ -22,6 +24,7 @@ class UserDto {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->role = $role;
+        $this->roleId = $roleId;
         $this->status = $status;
 
     }

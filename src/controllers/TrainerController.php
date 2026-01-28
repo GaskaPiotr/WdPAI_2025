@@ -17,7 +17,6 @@ class TrainerController extends AppController {
 
     public function __construct()
     {
-        // Inicjalizujemy TYLKO serwis. Repozytoria są ukryte wewnątrz serwisu.
         $this->trainerService = new TrainerService();
     }
 
@@ -33,7 +32,6 @@ class TrainerController extends AppController {
         $trainerId = $_SESSION['user_id'];
 
         try {
-            // Delegujemy brudną robotę do serwisu
             $this->trainerService->addTrainee($trainerId, $email);
 
             // Sukces - przekierowanie
@@ -52,13 +50,14 @@ class TrainerController extends AppController {
         $trainerId = $_SESSION['user_id'];
 
         if (!$traineeId) {
+            // Przekierowanie - brak ID w URL
             $url = "http://$_SERVER[HTTP_HOST]";
             header("Location: {$url}/dashboard");
             return;
         }
 
         try {
-            // Serwis zwraca nam gotową paczkę danych albo rzuca błędem
+            // Pobieramy dane z serwisu
             $data = $this->trainerService->getTraineeDetails($trainerId, (int)$traineeId);
 
             // Renderujemy widok używając danych z serwisu
@@ -68,9 +67,27 @@ class TrainerController extends AppController {
             ]);
 
         } catch (Exception $e) {
-            // W przypadku błędu (np. brak dostępu)
-            die($e->getMessage()); 
-            // lub ładniej: return $this->render('error', ['message' => $e->getMessage()]);
+            $msg = $e->getMessage();
+            $code = 400;
+
+            // Sprawdzamy treść błędu (z TrainerService)
+            if (strpos($msg, 'Access Denied') !== false) {
+                // Próba wejścia na nieswojego podopiecznego
+                $code = 403; // Forbidden
+            } 
+            elseif (strpos($msg, 'not found') !== false) {
+                // Niepoprawne ID użytkownika
+                $code = 404; // Not found
+            } 
+            else {
+                // Inne błędy
+                http_response_code($code); // Bad Request
+            }
+
+            return $this->render('error', [
+                'code' => $code,
+                'message' => $msg
+            ]);
         }
     }
 }

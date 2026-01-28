@@ -22,9 +22,11 @@ class WorkoutRepository extends Repository
     public function getTraineesByTrainerId(int $trainerId): array
     {
         $stmt = $this->database->connect()->prepare('
-            SELECT u.id, u.name, u.surname, u.email, tt.status
+            SELECT u.id, u.name, u.surname, u.email, tt.status, 
+                   u.role_id, r.name as role_name
             FROM users u
             JOIN trainer_trainees tt ON u.id = tt.trainee_id
+            JOIN roles r ON u.role_id = r.id
             WHERE tt.trainer_id = :trainer_id
         ');
 
