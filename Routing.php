@@ -1,12 +1,6 @@
 <?php
 
 
-//TODO AUTOWIRING NIE TRZEBA INCLUDOWAC 
-require_once 'src/controllers/SecurityController.php';
-require_once 'src/controllers/DashboardController.php';
-require_once 'src/controllers/TrainerController.php';
-require_once 'src/controllers/PlanController.php';
-
 class Routing {
 
     public static $routes = [
@@ -83,45 +77,34 @@ class Routing {
 
     public static function route($path) {
         if (preg_match('/^dashboard\/(\d+)$/', $path, $matches)) {
-            $controller = DashboardController::getInstance();
-            $controller->show($matches[1]); // wywołujemy metodę show($id)
+            $controllerName = 'DashboardController';
+            $object = $controllerName::getInstance();
+            $object->show($matches[1]); // wywołujemy metodę show($id)
             return;
         }
-        switch ($path) {
-            case '':
-            case 'delete-session':
-            case 'save-workout':
-            case 'start-workout':
-            case 'plan':
-            case 'add-exercise':
-            case 'delete-exercise':
-            case 'delete-plan':
-            case 'search-cards':
-            case 'dashboard':
-            case 'add-trainee':
-            case 'handle-invitation':
-            case 'logout':
-            case 'add-plan':
-            case 'trainee-dashboard':
-            case 'login':
-            case 'register':
-                $routeKey = $path; 
-                
-                if (array_key_exists($routeKey, Routing::$routes)) {
-                    $controller = Routing::$routes[$routeKey]['controller'];
-                    $action = Routing::$routes[$routeKey]['action'];
-    
-                    $controllerObj = $controller::getInstance();
-                    $controllerObj->$action();
-                } else {
-                    // Zabezpieczenie, gdyby case istniał, ale nie było wpisu w tablicy
-                    include 'public/views/404.html';
-                }
-                break;
 
-            default:
-                include 'public/views/404.html';
-                break;
+        if (array_key_exists($path, self::$routes)) {
+            // Wyciągamy nazwę kontrolera i akcji z tablicy
+            $route = self::$routes[$path];
+            
+            $controllerName = $route['controller'];
+            $action = $route['action'];
+
+            // Tworzymy obiekt dynamicznie
+            $object = $controllerName::getInstance();
+            
+            // Wywołujemy metodę
+            $object->$action();
+        } else {
+            // 3. Brak trasy -> 404
+            http_response_code(404);
+            
+            // Ustawiamy zmienne, których oczekuje error.html
+            $code = 404;
+            $message = 'Page not found. The URL you are looking for does not exist.';
+
+            // Używamy uniwersalnego widoku
+            include 'public/views/error.html';
         }
     }
 

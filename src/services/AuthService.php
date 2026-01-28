@@ -22,15 +22,15 @@ class AuthService {
             $lastAttemptTime = strtotime($attemptData['last_attempt']);
             $currentTime = time();
 
-            // Jeśli przekroczono limit prób...
+            // Jeśli przekroczono limit prób
             if ($attempts >= self::MAX_LOGIN_ATTEMPTS) {
-                // ...i nie minął jeszcze czas blokady
+                // i nie minął jeszcze czas blokady
                 if (($currentTime - $lastAttemptTime) < self::BLOCK_TIME_SECONDS) {
                     $timeLeft = self::BLOCK_TIME_SECONDS - ($currentTime - $lastAttemptTime);
                     throw new Exception("Too many failed attempts. Try again in $timeLeft seconds.");
                 } else {
-                    // Czas minął, czyścimy stare próby (opcjonalnie, lub resetujemy przy sukcesie)
-                    // Tutaj możemy pozwolić na próbę, ale nie zerujemy licznika od razu
+                    // Czas kary minął -> Resetujemy licznik, dając czystą kartę
+                    $this->userRepository->clearLoginAttempts($ipAddress);
                 }
             }
         }
@@ -94,7 +94,7 @@ class AuthService {
         // 2. Sprawdzenie duplikatów
         $existingUser = $this->userRepository->getUserByEmail($email);
         if ($existingUser) {
-            throw new Exception('User with this email already exists!');
+            throw new Exception('If User with this email already exists, we sent information to this email');
         }
 
         // 3. Pobranie ID roli i zapis
@@ -105,7 +105,6 @@ class AuthService {
             $this->userRepository->createUser($name, $surname, $email, $hashedPassword, $roleId);
             
         } catch (Exception $e) {
-            // Możemy rzucić bardziej ogólny błąd dla użytkownika, logując prawdziwy błąd w tle
             throw new Exception('An error occurred during registration.');
         }
     }

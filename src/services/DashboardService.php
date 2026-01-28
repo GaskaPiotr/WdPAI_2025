@@ -24,9 +24,7 @@ class DashboardService {
 
         // 2. Decydujemy o scenariuszu
         if ($userRoleId == $trainerRoleId) {
-            // === SCENARIUSZ TRENERA ===
-            //$trainees = $this->workoutRepository->getTraineesByTrainerId($userId);
-
+            // Scenariusz Trenera
             $trainerService = new TrainerService(); 
             $traineesDto = $trainerService->getTraineesList($userId);
             
@@ -35,7 +33,7 @@ class DashboardService {
                 'data' => ['trainees' => $traineesDto]
             ];
         } else {
-            // === SCENARIUSZ ĆWICZĄCEGO ===
+            // Scenariusz Ćwiczącego
             $plans = $this->workoutRepository->getPlansByUserId($userId);
             $invitations = $this->workoutRepository->getPendingInvitations($userId);
 
@@ -55,6 +53,5 @@ class DashboardService {
         } elseif ($action === 'decline') {
             $this->workoutRepository->declineInvitation($requestId);
         }
-        // Jeśli akcja jest inna, po prostu nic nie robimy (lub rzucamy wyjątek)
     }
 }

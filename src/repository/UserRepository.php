@@ -17,7 +17,6 @@ class UserRepository extends Repository {
         return self::$instance;
     }
 
-    // 3. PRYWATNY konstruktor (blokuje `new UserRepository()`)
     // Wywołujemy parent::__construct(), aby zainicjować połączenie z bazą z klasy Repository
     private function __construct() {
         parent::__construct();
@@ -36,7 +35,6 @@ class UserRepository extends Repository {
        return $users;
     }
 
-    // Nowa metoda: zamienia nazwę roli (np. "trainer") na jej ID (np. 2)
     public function getRoleByName(string $roleName): int {
         $stmt = $this->database->connect()->prepare('
             SELECT id FROM roles WHERE name = :roleName
@@ -47,8 +45,6 @@ class UserRepository extends Repository {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$result) {
-            // Jeśli ktoś próbuje włamać się i wysłać "admin", a nie mamy takiej roli
-            // to rzucamy błąd lub ustawiamy domyślną rolę. 
             throw new Exception("Role not found!"); 
         }
 
@@ -110,7 +106,6 @@ class UserRepository extends Repository {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
 
-        // fetch zwraca tablicę LUB false. Jeśli zwróci false, kontroler to wyłapie.
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
         if ($user == false) {
@@ -136,13 +131,11 @@ class UserRepository extends Repository {
         $stmt->bindParam(':ip', $ipAddress, PDO::PARAM_STR);
         $stmt->execute();
         
-        // Zwracamy tablicę lub null
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: []; 
     }
 
 
     public function incrementLoginAttempts(string $ipAddress): void {
-        // Sprawdzamy czy IP już istnieje
         $exists = $this->getLoginAttempts($ipAddress);
 
         if ($exists) {

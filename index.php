@@ -1,5 +1,20 @@
 <?php
 
+spl_autoload_register(function ($class) {
+    // To prosty autoloader, w dużych projektach robi to Composer (PSR-4). 
+    $path = 'src/controllers/' . $class . '.php';
+    
+    if (file_exists($path)) {
+        require_once $path;
+    } else {
+        // Opcjonalnie sprawdź inne ścieżki, np. serwisy
+        $pathServices = 'src/services/' . $class . '.php';
+        if (file_exists($pathServices)) {
+            require_once $pathServices;
+        }
+    }
+});
+
 session_set_cookie_params([
     'lifetime' => 0,            // Sesja wygasa po zamknięciu przeglądarki
     'path' => '/',              // Ciasteczko dostępne dla całej domeny

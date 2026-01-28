@@ -25,15 +25,14 @@ class PlanService {
 
         $isOwner = ($plan['user_id'] === $currentUserId);
         
-        // Jeśli nie jest właścicielem, sprawdzamy, czy jest TRENEREM tego użytkownika
+        // Jeśli nie jest właścicielem, sprawdzamy, czy jest Trenerem tego użytkownika
         $isTrainer = false;
         if (!$isOwner) {
             // Sprawdzamy w repozytorium czy istnieje relacja trener-podopieczny
-            // currentUserId to Trener (potencjalnie), plan['user_id'] to Podopieczny
             $isTrainer = $this->workoutRepository->isTraineeAccepted($currentUserId, $plan['user_id']);
         }
 
-        // Jeśli ani właściciel, ani trener -> WARA!
+        // Jeśli ani właściciel, ani trener wyrzucamy wyjątek
         if (!$isOwner && !$isTrainer) {
             throw new Exception("Access Denied. You do not have permission to view this plan.");
         }
@@ -53,9 +52,8 @@ class PlanService {
             throw new Exception("Exercise name is too long (max 100 chars).");
         }
 
-        // Notatka może być dłuższa, ale bez przesady (np. 500 znaków)
-        if (strlen($note) > 500) {
-            throw new Exception("Note is too long (max 500 chars).");
+        if (strlen($note) > 255) {
+            throw new Exception("Note is too long (max 255 chars).");
         }
 
         if (empty($exerciseName)) {
@@ -78,14 +76,13 @@ class PlanService {
             $userEntity = $this->userRepository->getUserById($targetTraineeId);
             
             if ($userEntity) {
-                // TWORZYMY DTO
-                // Przepisujemy dane z Entity do DTO
                 $traineeDto = new UserDto(
                     $userEntity->getId(),
                     $userEntity->getEmail(),
                     $userEntity->getName(),
                     $userEntity->getSurname(),
-                    'trainee',
+                    $userEntity->getRoleName(),
+                    $userEntity->getRoleId(),
                     null
                 );
             }

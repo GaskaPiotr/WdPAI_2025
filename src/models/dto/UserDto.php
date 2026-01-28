@@ -9,7 +9,6 @@ class UserDto {
     public int $roleId;
     public ?string $status;
 
-    // Konstruktor
     public function __construct(
         int $id, 
         string $email, 

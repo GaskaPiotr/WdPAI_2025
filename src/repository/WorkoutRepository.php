@@ -112,7 +112,6 @@ class WorkoutRepository extends Repository
         $stmt->execute();
     }
 
-    // Pobiera plany dla konkretnego podopiecznego, stworzone przez konkretnego trenera
     public function getPlansByTrainerAndTrainee(int $trainerId, int $traineeId): array
     {
         $stmt = $this->database->connect()->prepare('
@@ -157,7 +156,6 @@ class WorkoutRepository extends Repository
         try {
             $pdo->beginTransaction();
 
-            // 1. Zapisujemy SESJĘ
             $stmt = $pdo->prepare('
                 INSERT INTO workout_sessions (workout_plan_id, user_note) 
                 VALUES (:plan_id, :note) 
@@ -169,7 +167,6 @@ class WorkoutRepository extends Repository
             
             $sessionId = $stmt->fetch(PDO::FETCH_ASSOC)['id'];
 
-            // 2. Zapisujemy LOGI
             $sql = 'INSERT INTO workout_logs 
                     (workout_session_id, plan_exercise_id, set_number, weight, reps, time_seconds, distance_km) 
                     VALUES (:session_id, :pe_id, :set_num, :w, :r, :t, :d)';
@@ -182,9 +179,7 @@ class WorkoutRepository extends Repository
                     if ($this->isEmptySet($data)) {
                         continue; 
                     }
-
-                    // --- POPRAWKA TUTAJ: Używamy '??' aby uniknąć błędu Undefined array key ---
-                    
+ 
                     // Pobieramy wartość lub pusty string, jeśli klucz nie istnieje
                     $rawWeight = $data['weight'] ?? '';
                     $rawReps   = $data['reps'] ?? '';
@@ -241,7 +236,6 @@ class WorkoutRepository extends Repository
     // Pobierz X ostatnich sesji dla danego planu
     public function getLastSessions(int $planId, int $limit = 3): array
     {
-        // Dodałem: user_note
         $stmt = $this->database->connect()->prepare('
             SELECT id, date, user_note 
             FROM workout_sessions 
